@@ -15,13 +15,38 @@
 
 class BaseModel:
     def __init__(self):
+        # Just keeping this here in-case I ever wanna add some base functionality
         pass
+
+    @classmethod
+    def init_from_json(cls, json_object):
+        pass
+        # Code for initializing from json
 
 
 class Agency(BaseModel):
-    def __init__(self, **kwargs):
-        #self.param = placeholder...
+    def __init__(self, api_instance, **kwargs):
+        self.param_translations = {"id": "id",
+                                   "name": "name",
+                                   "abbrev": "abbrev",
+                                   "type": "type",
+                                   "country_code": "countryCode",
+                                   "wiki_url": "wikiURL",
+                                   "info_urls": "infoURLs",
+                                   "is_lsp": "islsp",
+                                   "changed": "changed"}
 
-        for param, value in kwargs.items():
-            setattr(self, param, value)
+        self.api_instance = api_instance
 
+        for pythonic_name, api_name in self.param_translations.items():
+            setattr(self, pythonic_name, kwargs.get(api_name, None))
+
+        super().__init__()
+
+    @property
+    def type_name(self):
+        """Returns the name of the agency type."""
+        if self.name_cache is None:
+            pass  # Add code to get agency type from the api
+        else:
+            return self.name_cache
