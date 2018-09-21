@@ -12,36 +12,41 @@
 #    See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 class BaseModel:
-    def __init__(self):
+    def __init__(self, endpoint, param_translations, nested_name, api_instance):
         # Just keeping this here in-case I ever wanna add some base functionality
+        self.param_translations = param_translations
+        self.endpoint = endpoint
+        self.nested_name = nested_name
+        self.api_instance = api_instance
         pass
 
     @classmethod
-    def init_from_json(cls, json_object):
-        pass
-        # Code for initializing from json
+    def init_from_json(cls, api_instance, json_object):
+        cls_init = cls(api_instance)
+        nested_name = cls_init.nested_name
+        json_object = json_object[nested_name][0]
+        for pythonic_name, api_name in cls_init.param_translations.items():
+            setattr(cls_init, pythonic_name, json_object.get(api_name, None))
+
+        return cls_init
 
 
 class Agency(BaseModel):
-    def __init__(self, api_instance, **kwargs):
-        self.param_translations = {"id": "id",
-                                   "name": "name",
-                                   "abbrev": "abbrev",
-                                   "type": "type",
-                                   "country_code": "countryCode",
-                                   "wiki_url": "wikiURL",
-                                   "info_urls": "infoURLs",
-                                   "is_lsp": "islsp",
-                                   "changed": "changed"}
+    def __init__(self, api_instance):
+        param_translations = {"id": "id",
+                              "name": "name",
+                              "abbrev": "abbrev",
+                              "type": "type",
+                              "country_code": "countryCode",
+                              "wiki_url": "wikiURL",
+                              "info_urls": "infoURLs",
+                              "is_lsp": "islsp",
+                              "changed": "changed"}
+        nested_name = "agencies"
+        self.name_cache = None
 
-        self.api_instance = api_instance
-
-        for pythonic_name, api_name in self.param_translations.items():
-            setattr(self, pythonic_name, kwargs.get(api_name, None))
-
-        super().__init__()
+        super().__init__("/agency", param_translations, nested_name, api_instance)
 
     @property
     def type_name(self):
