@@ -33,9 +33,13 @@ properties = launches[0].param_names
 
 [ ] Handle times with the datetime class
 
-[ ] More?
-
 [ ] Package the wrapper up and upload to PyPI
+
+[ ] Asynchronous operation
+
+[ ] Your suggestion here
+
+
 
 Feel free to open issues and pull requests! I usually check Github daily. 
  
