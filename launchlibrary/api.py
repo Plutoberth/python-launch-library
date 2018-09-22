@@ -26,14 +26,13 @@ class Api:
         # with a different version than the default one.
         self.url = "/".join([api_url, version])
 
-    @staticmethod
-    def parse_data(data: dict) -> str:
+    def parse_data(self, data: dict) -> str:
         """
         Parse data as get parameters.
         :param data: A dictionary containing key value pairs
         :return
         """
-        return "?" + "&".join([f"{k}={v}" for k, v in data.items()])
+        return "?mode={}&".format(self.mode) + "&".join([f"{k}={v}" for k, v in data.items()])
 
     def send_message(self, endpoint, data):
         request_url = "/".join([self.url, endpoint]) + self.parse_data(data)
