@@ -11,13 +11,13 @@ The usage of the API is simple.
 
 ```python
 # Import the launchlibrary lib
-import launchlibrary
+import launchlibrary as ll
 
 # Create an instance of the API
-api = launchlibrary.Api()  # You can also specify api url, api version...
+api = ll.Api()  # You can also specify api url, api version...
 
 # And request the next 5 launches, for example.
-launches = launchlibrary.Launch.fetch(api, next=5) # Any argument after "api" is not constrained (w/ kwargs).
+launches = ll.Launch.fetch(api, next=5) # Any argument after "api" is not constrained (w/ kwargs).
 # ^ Returns a list of launch objects.
 
 # You can fetch the pythonic property names by using launch.param_names
