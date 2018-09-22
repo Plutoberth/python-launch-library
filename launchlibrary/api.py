@@ -33,7 +33,7 @@ class Api:
         :param data: A dictionary containing key value pairs
         :return
         """
-        return "?" + "?".join([f"{k}={v}" for k, v in data.items()])
+        return "?" + "&".join([f"{k}={v}" for k, v in data.items()])
 
     def send_message(self, endpoint, data):
         request_url = "/".join([self.url, endpoint]) + self.parse_data(data)
