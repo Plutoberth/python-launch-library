@@ -118,9 +118,13 @@ class AgencyType(BaseModel):
 
 class Launch(BaseModel):
     def __init__(self, api_instance):
-                                  netstamp="netstamp", info_urls="infoURLs", vid_urls="vidURLs", holdreason="holdreason"
-                                  , failreason="failreason", probability="probability", hashtag="hashtag", lsp="lsp",
-                                  changed="changed", location="location", rocket="rocket", missions="missions")
+        self.datetime_conversions = dict()
+        param_translations = dict(id="id", name="name", tbddate="tbddate", tbdtime="tbdtime", status="status"
+                                  , inhold="inhold", windowstart="isostart", windowend="isoend",
+                                  net="isonet", info_urls="infoURLs",
+                                  vid_urls="vidURLs", holdreason="holdreason", failreason="failreason",
+                                  probability="probability", hashtag="hashtag", _lsp="lsp", changed="changed",
+                                  location="location", rocket="rocket", missions="missions")
         proper_name = self.__class__.__name__
         nested_name = "launches"
         endpoint_name = "launch"
@@ -142,3 +146,32 @@ class Launch(BaseModel):
     def postprocess(self):
         """Implement relevant models."""
         for time_name in ["windowstart", "windowend", "net"]:
+            # Will need to modify this if we ever implement modes other than verbose
+            setattr(self, time_name, parser.parse(getattr(self, time_name, 0)))
+
+
+class Pad(BaseModel):
+    def __init__(self, api_instance):
+        param_translations = dict(id="id", name="name", pad_type="padType", latitude="latitude", longitude="longitude",
+                                  map_url="mapURL", retired="retired", locationid="locationid", agencies="agencies",
+                                  wiki_url="wikiURL", info_urls="infoURLs")
+        proper_name = self.__class__.__name__
+        nested_name = "pads"
+        endpoint_name = "pad"
+
+        super().__init__(endpoint_name, param_translations, nested_name, api_instance, proper_name)
+
+
+class Location(BaseModel):
+    def __init__(self, api_instance):
+        param_translations = dict(id="id", name="name", country_code="countrycode", wiki_url="wikiURL"
+                                  , info_urls="infoURLs", pads="pads")  # pads might be included w/ launch endpoint
+        proper_name = self.__class__.__name__
+        nested_name = "pads"
+        endpoint_name = "pad"
+
+        super().__init__(endpoint_name, param_translations, nested_name, api_instance, proper_name)
+
+
+MODEL_LIST_PLURAL = {"agencies": Agency, "pads": Pad, "locations": Location}  # putting it at the end to load the class
+MODEL_LIST_SINGULAR = {"agency": Agency, "pad": Pad, "location": Location}
