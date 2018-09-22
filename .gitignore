@@ -168,3 +168,5 @@ fabric.properties
 .idea/httpRequests
 
 .idea/*
+
+launchlibrary/test.py
