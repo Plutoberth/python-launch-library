@@ -12,11 +12,11 @@
 #    See the License for the specific language governing permissions and
 # limitations under the License.
 
-import requests
-from .models import *
 
 DEFAULT_API_URL = "https://launchlibrary.net"
 DEFAULT_VERSION = "1.4"
+
+import requests
 
 
 class Api:
@@ -27,7 +27,8 @@ class Api:
         # with a different version than the default one.
         self.url = "/".join([api_url, version])
 
-    def parse_data(self, data: dict) -> str:
+    @staticmethod
+    def parse_data(data: dict) -> str:
         """
         Parse data as get parameters.
         :param data: A dictionary containing key value pairs
@@ -46,6 +47,4 @@ class Api:
 
         return resp.json()  # Returns a json style object of the response.
 
-    def get_agency(self, **kwargs):
-        json_object = self.send_message("agency", kwargs)
-        return Agency.init_from_json(self, json_object)
+

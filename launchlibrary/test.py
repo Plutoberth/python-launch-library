@@ -1,6 +1,5 @@
 import launchlibrary
 
 a = launchlibrary.Api()
-b = a.get_agency(id=5)
-
-print(b)
+agencies = launchlibrary.Agency.fetch(a, name="SpaceX")
+print(agencies)
