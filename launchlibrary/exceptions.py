@@ -14,6 +14,7 @@
 
 # Unused at the moment. Will add exceptions later.
 
+
 class InitException(Exception):
     def __init__(self, message="Models must be initialized from the init_from_json classmethod."):
         # Call the base class constructor with the parameters it needs

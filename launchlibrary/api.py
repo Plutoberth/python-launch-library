@@ -12,11 +12,10 @@
 #    See the License for the specific language governing permissions and
 # limitations under the License.
 
+import requests
 
 DEFAULT_API_URL = "https://launchlibrary.net"
 DEFAULT_VERSION = "1.4"
-
-import requests
 
 
 class Api:
@@ -46,5 +45,3 @@ class Api:
             raise e
 
         return resp.json()  # Returns a json style object of the response.
-
-
