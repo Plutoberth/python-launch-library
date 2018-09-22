@@ -9,6 +9,8 @@ The usage of the API is simple.
 
 ### Usage
 
+To install, simply use pip: ```pip install python-launch-library```
+
 ```python
 # Import the launchlibrary lib
 import launchlibrary as ll
