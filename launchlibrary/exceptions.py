@@ -12,6 +12,7 @@
 #    See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Unused at the moment. Will add exceptions later.
 
 class InitException(Exception):
     def __init__(self, message="Models must be initialized from the init_from_json classmethod."):
