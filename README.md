@@ -27,7 +27,7 @@ properties = launches[0].param_names
 ### Todo
 - [ ] Tidy up the repository
 - [ ] Add exceptions to handle server timeout
-- [ ] Handle nested models (i.e. a Rocket model inside a Launch model)
+- [x] Handle nested models (i.e. a Pad model inside a Location model inside a Launch model)
 - [ ] Handle times with the datetime class
 - [ ] Package properly and upload to PyPI
 - [ ] Asynchronous operation
