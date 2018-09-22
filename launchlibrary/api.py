@@ -37,7 +37,6 @@ class Api:
 
     def send_message(self, endpoint, data):
         request_url = "/".join([self.url, endpoint]) + self.parse_data(data)
-        print(request_url)
         try:
             resp = requests.get(request_url)
         except requests.exceptions.RequestException as e:  # Catch all exceptions from the module

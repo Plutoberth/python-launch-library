@@ -34,9 +34,7 @@ class BaseModel:
         """Initializes a class, or even a list of them from the api using the needed params."""
         cls_init = cls(api_instance)
         json_object = api_instance.send_message(cls_init.endpoint, kwargs)
-
         classes = []
-        print(json_object)
 
         for entry in json_object.get(cls_init.nested_name, []):
             cls_init = cls(api_instance)

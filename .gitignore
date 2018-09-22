@@ -170,3 +170,4 @@ fabric.properties
 .idea/*
 
 launchlibrary/tests.py
+buildandupload.bat
