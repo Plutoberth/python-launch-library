@@ -14,7 +14,7 @@ The usage of the API is simple.
 import launchlibrary
 
 # Create an instance of the API
-api = launchlibrary.Api()  # You can also specify data mode, api url, api version...
+api = launchlibrary.Api()  # You can also specify api url, api version...
 
 # And request the next 5 launches, for example.
 launches = launchlibrary.Launch.fetch(api, next=5) # Any argument after "api" is not constrained (w/ kwargs).
@@ -33,7 +33,7 @@ properties = launches[0].param_names
 
 [ ] Handle times with the datetime class
 
-[ ] Package the wrapper up and upload to PyPI
+[ ] Package properly and upload to PyPI
 
 [ ] Asynchronous operation
 

@@ -12,9 +12,14 @@
 #    See the License for the specific language governing permissions and
 # limitations under the License.
 
-import functools
+
+from dateutil import parser
+from functools import lru_cache
+
 
 class BaseModel:
+    """A class representing the base model of all models. Should be "private"."""
+
     def __init__(self, endpoint, param_translations, nested_name, api_instance, proper_name):
         # param translations serves both for pythonic translations and default param values
         self.param_translations = param_translations
@@ -36,6 +41,7 @@ class BaseModel:
         for entry in json_object.get(cls_init.nested_name, []):
             cls_init = cls(api_instance)
             cls_init.set_params_json(entry)
+            cls_init.postprocess()
             classes.append(cls_init)
 
         return classes
@@ -50,12 +56,31 @@ class BaseModel:
         """
         cls_init = cls(api_instance)
         cls_init.set_params_json(json_object)
+        cls_init.postprocess()
         return cls_init
 
     def set_params_json(self, json_object):
         """Sets the parameters of a class from an object (raw data, not inside "agenices" for example)"""
+        self.modelize(json_object)
         for pythonic_name, api_name in self.param_translations.items():
             setattr(self, pythonic_name, json_object.get(api_name, None))
+
+    def modelize(self, json_object):
+        """Recursively goes over the json object, looking for any compatible models. It'll be called again
+        recursively, but in an indirect way."""
+        for key, val in json_object.items():
+            if key in MODEL_LIST_PLURAL.keys():
+                if val:
+                    if len(val) > 0:
+                        json_object[key] = [MODEL_LIST_PLURAL[key].init_from_json(self.api_instance, r) for r in val]
+            elif key in MODEL_LIST_SINGULAR.keys():  # if it is a singular
+                if val:
+                    if len(val) > 0:
+                        json_object[key] = MODEL_LIST_SINGULAR[key].init_from_json(self.api_instance, val)
+
+    def postprocess(self):
+        """Optional method. May be used for model specific operations (like purging times)."""
+        pass
 
     def __repr__(self):
         subclass_name = self.proper_name
@@ -74,7 +99,7 @@ class Agency(BaseModel):
 
         super().__init__(endpoint_name, param_translations, nested_name, api_instance, proper_name)
 
-    @functools.lru_cache(maxsize=None)
+    @lru_cache(maxsize=None)
     def get_type(self):
         """Returns the name of the agency type."""
         agency_type = AgencyType.fetch(self.api_instance, id=self.type)
@@ -93,10 +118,6 @@ class AgencyType(BaseModel):
 
 class Launch(BaseModel):
     def __init__(self, api_instance):
-        param_translations = dict(id="id", name="name", net="net", tbddate="tbddate", tbdtime="tbdtime", status="status"
-                                  , inhold="inhold", windowstart="windowstart", windowend="windowend",
-                                  isostart="isostart"
-                                  , isoend="isoend", isonet="isonet", wsstamp="wsstamp", westamp="westamp",
                                   netstamp="netstamp", info_urls="infoURLs", vid_urls="vidURLs", holdreason="holdreason"
                                   , failreason="failreason", probability="probability", hashtag="hashtag", lsp="lsp",
                                   changed="changed", location="location", rocket="rocket", missions="missions")
@@ -106,13 +127,18 @@ class Launch(BaseModel):
 
         super().__init__(endpoint_name, param_translations, nested_name, api_instance, proper_name)
 
+    @lru_cache(maxsize=None)
     def get_agency(self):
         """Gets the Agency model of the launch service provider either from json or from the server."""
-        if self.api_instance.mode == "verbose" and self.lsp is not None:
-            lsp = Agency.init_from_json(self.api_instance, self.lsp)
+        if self.api_instance.mode == "verbose" and self._lsp is not None:
+            lsp = Agency.init_from_json(self.api_instance, self._lsp)
         else:
-            lsp = Agency.fetch(self.api_instance, id=self.lsp)
+            lsp = Agency.fetch(self.api_instance, id=self._lsp)
             if len(lsp) > 0:
                 lsp = lsp[0]
 
         return lsp
+
+    def postprocess(self):
+        """Implement relevant models."""
+        for time_name in ["windowstart", "windowend", "net"]:
