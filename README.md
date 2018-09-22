@@ -33,6 +33,7 @@ properties = launches[0].param_names
 - [x] Handle times with the datetime class
 - [x] Package properly and upload to PyPI
 - [ ] Asynchronous operation
+- [ ] Add more abstraction methods for the api calls
 - [ ] Your suggestion here
 
 

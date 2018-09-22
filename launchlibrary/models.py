@@ -129,6 +129,15 @@ class Launch(BaseModel):
 
         super().__init__(endpoint_name, param_translations, nested_name, api_instance, proper_name)
 
+    @classmethod
+    def next(cls, api_instance, num):
+        """
+        A simple abstraction method to get the next {num} launches.
+        :param api_instance: An instance of launchlibrary.Api
+        :param num: a number for the number of launches
+        """
+        return cls.fetch(api_instance, next=num, status=1)
+
     @lru_cache(maxsize=None)
     def get_agency(self):
         """Gets the Agency model of the launch service provider either from json or from the server."""
