@@ -14,13 +14,14 @@
 
 
 class BaseModel:
-    def __init__(self, endpoint, param_translations, nested_name, api_instance, proper_name, kwargs):
-        # Just keeping this here in-case I ever wanna add some base functionality
+    def __init__(self, endpoint, param_translations, nested_name, api_instance, proper_name):
+        # param translations contains translations from non-pythonic to pythonic names
         self.param_translations = param_translations
         self.endpoint = endpoint
         self.nested_name = nested_name
         self.api_instance = api_instance
         self.proper_name = proper_name
+        self.param_names = []  # for use in repr, locals doesn't work for some reason
 
     @classmethod
     def fetch(cls, api_instance, **kwargs):
@@ -30,7 +31,8 @@ class BaseModel:
 
         cls_init = cls(api_instance)
         classes = []
-        for entry in json_object[cls_init.nested_name]:
+        print(json_object)
+        for entry in json_object.get(cls_init.nested_name, []):
             cls_init = cls(api_instance)
             cls_init.set_params_json(entry)
             classes.append(cls_init)
@@ -39,32 +41,27 @@ class BaseModel:
 
     def set_params_json(self, json_object):
         """Sets the parameters of a class from an object (raw data, not inside "agenices" for example)"""
-        for pythonic_name, api_name in self.param_translations.items():
-            setattr(self, pythonic_name, json_object.get(api_name, None))
+        for api_name, value in json_object.items():
+            setattr(self, self.param_translations.get(api_name, api_name), value)
+            self.param_names.append(self.param_translations.get(api_name, api_name))
 
     def __repr__(self):
         subclass_name = self.proper_name
-        variables = ",".join(f"{k}={getattr(self, k)}" for k, v in self.param_translations.items())
+        variables = ",".join(f"{k}={getattr(self, k)}" for k in self.param_names)
 
         return "{}({})".format(subclass_name, variables)
 
 
 class Agency(BaseModel):
-    def __init__(self, api_instance, **kwargs):
-        param_translations = {"id": "id",
-                              "name": "name",
-                              "abbrev": "abbrev",
-                              "type": "type",
-                              "country_code": "countryCode",
-                              "wiki_url": "wikiURL",
-                              "info_urls": "infoURLs",
-                              "is_lsp": "islsp",
-                              "changed": "changed"}
-        proper_name = "Agency"
+    def __init__(self, api_instance):
+        param_translations = dict(country_code="countryCode", wiki_url="wikiURL", info_urls="infoURLs", is_lsp="islsp")
+        proper_name = self.__class__.__name__
         nested_name = "agencies"
+        endpoint_name = "agency"
+
         self.name_cache = None
 
-        super().__init__("/agency", param_translations, nested_name, api_instance, proper_name, kwargs)
+        super().__init__(endpoint_name, param_translations, nested_name, api_instance, proper_name)
 
     @property
     def type_name(self):
@@ -73,3 +70,13 @@ class Agency(BaseModel):
             pass  # Add code to get agency type from the api
         else:
             return self.name_cache
+
+
+class Launch(BaseModel):
+    def __init__(self, api_instance):
+        param_translations = dict(wiki_url="wikiURL", info_urls="infoURLs", vid_urls="vidURLs")
+        proper_name = self.__class__.__name__
+        nested_name = "launches"
+        endpoint_name = "launch"
+
+        super().__init__(endpoint_name, param_translations, nested_name, api_instance, proper_name)
