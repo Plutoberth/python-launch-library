@@ -62,7 +62,7 @@ class BaseModel:
 
         for entry in json_object.get(cls_init.nested_name, []):
             cls_init = cls(api_instance)
-            cls_init.set_params_json(entry)
+            cls_init._set_params_json(entry)
             cls_init._postprocess()
             classes.append(cls_init)
 
@@ -78,17 +78,17 @@ class BaseModel:
         :return: cls
         """
         cls_init = cls(api_instance)
-        cls_init.set_params_json(json_object)
+        cls_init._set_params_json(json_object)
         cls_init._postprocess()
         return cls_init
 
-    def set_params_json(self, json_object: dict):
+    def _set_params_json(self, json_object: dict):
         """Sets the parameters of a class from an object (raw data, not inside "agencies" for example)"""
-        self.modelize(json_object)
+        self._modelize(json_object)
         for pythonic_name, api_name in self.param_translations.items():
             setattr(self, pythonic_name, json_object.get(api_name, None))
 
-    def modelize(self, json_object):
+    def _modelize(self, json_object):
         """Recursively goes over the json object, looking for any compatible models. It's recursive in an indirect
         way (through set_params_json)."""
 
@@ -114,6 +114,8 @@ class BaseModel:
 
 
 class AgencyType(BaseModel):
+    """A class representing an agency type object."""
+
     def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", changed="changed")
 
@@ -129,6 +131,8 @@ class AgencyType(BaseModel):
 
 
 class Agency(BaseModel):
+    """A class representing an agency object."""
+
     def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", abbrev="abbrev", type="type", country_code="countryCode"
                                   , wiki_url="wikiURL", info_urls="infoURLs", is_lsp="islsp", changed="changed")
@@ -162,6 +166,8 @@ class Agency(BaseModel):
 
 
 class LaunchStatus(BaseModel):
+    """A class representing a launch status object."""
+
     def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", description="description", changed="changed")
 
@@ -178,15 +184,9 @@ class LaunchStatus(BaseModel):
 
 
 class Launch(BaseModel):
-    def __init__(self, api_instance: Api, test):
-        """
-        something
+    """A class representing a launch object."""
 
-        :param api_instance:
-        :param test: yes
-        """
-
-        self.test = test
+    def __init__(self, api_instance: Api):
         self.datetime_conversions = dict()
         param_translations = dict(id="id", name="name", tbddate="tbddate", tbdtime="tbdtime", status="status"
                                   , inhold="inhold", windowstart="isostart", windowend="isoend",
@@ -269,6 +269,8 @@ class Launch(BaseModel):
 
 
 class Pad(BaseModel):
+    """A class representing a pad object."""
+
     def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", pad_type="padType", latitude="latitude", longitude="longitude",
                                   map_url="mapURL", retired="retired", locationid="locationid", agencies="agencies",
@@ -294,6 +296,8 @@ class Pad(BaseModel):
 
 
 class Location(BaseModel):
+    """A class representing a location object."""
+
     def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", country_code="countrycode", wiki_url="wikiURL"
                                   , info_urls="infoURLs", pads="pads")  # pads might be included w/ launch endpoint
@@ -313,6 +317,8 @@ class Location(BaseModel):
 
 
 class RocketFamily(BaseModel):
+    """A class representing a rocket family object."""
+
     def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", agencies="agencies", changed="changed")
 
@@ -329,6 +335,8 @@ class RocketFamily(BaseModel):
 
 
 class Rocket(BaseModel):
+    """A class representing a rocket object."""
+
     def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", default_pads="defaultPads", family="family",
                                   wiki_url="wikiURL", info_urls="infoURLs", image_url="imageURL"
@@ -351,7 +359,7 @@ class Rocket(BaseModel):
 
     @lru_cache(maxsize=None)
     def get_pads(self) -> List[Pad]:
-        """Returns objects of the rocket's pads."""
+        """Returns Pad type objects of the pads the rocket uses."""
         if self.default_pads:
             pad_objs = Pad.fetch(self.api_instance, id=self.default_pads)
             return pad_objs if pad_objs else []  # Make sure to obey types
@@ -360,7 +368,6 @@ class Rocket(BaseModel):
 
 
 # putting it at the end to load the classes first
-
-
-MODEL_LIST_PLURAL = {"agencies": Agency, "pads": Pad, "locations": Location, "rockets": Rocket}
+MODEL_LIST_PLURAL = {"agencies": Agency, "pads": Pad, "locations": Location
+                     , "rockets": Rocket, "families": RocketFamily}
 MODEL_LIST_SINGULAR = {"agency": Agency, "pad": Pad, "location": Location, "rocket": Rocket, "family": RocketFamily}
