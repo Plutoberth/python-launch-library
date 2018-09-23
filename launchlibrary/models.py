@@ -207,7 +207,7 @@ class Launch(BaseModel):
     =========  ===========
     Operation  Description
     ---------  -----------
-    x < y      Checks if launch y occurs before launch y.
+    x < y      Checks if launch y occurs before launch x.
     x > y      Checks if launch x occurs before launch y.
     =========  ==========="""
 
