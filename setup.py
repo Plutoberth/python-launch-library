@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="python-launch-library",
-    version="0.1.4",
+    version="0.2",
     author="Nir Harel",
     author_email="nir@nirharel.space",
     description="A wrapper for the launchlibrary.net API",
