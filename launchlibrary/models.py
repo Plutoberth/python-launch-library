@@ -110,7 +110,7 @@ class BaseModel:
 
     def __repr__(self) -> str:
         subclass_name = self.proper_name
-        variables = ",".join(f"{k}={v}" for k, v in self._get_all_params().items())
+        variables = ",".join("{}={}".format(k, v) for k, v in self._get_all_params().items())
         return "{}({})".format(subclass_name, variables)
 
     def __eq__(self, other):
