@@ -51,7 +51,7 @@ class Api:
         request_url = "/".join([self.url, endpoint]) + self.parse_data(data)
         try:
             resp = requests.get(request_url)
-            if resp.status_code == '404':  # If it didn't find anything
+            if resp.status_code == 404: # If it didn't find anything
                 raise ll_exceptions.ApiException  # raise an api exception
             resp_dict = resp.json()
 
