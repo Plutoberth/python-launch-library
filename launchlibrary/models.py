@@ -20,7 +20,6 @@ import datetime
 from typing import List
 from launchlibrary import Api
 from launchlibrary import utils
-import json
 
 # Set default dt to the beginning of next month
 DEFAULT_DT = datetime.datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0) \
