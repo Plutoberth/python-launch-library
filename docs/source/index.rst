@@ -16,4 +16,4 @@ About Launch Library
 --------------------
 Launch Library is a free to use website that exposes a rich API with a plethora of data about future (and past) launches.
 
-Check them out `here <https://launchlibrary.net/>`_!.
+Check them out `here <https://launchlibrary.net/>`_!
