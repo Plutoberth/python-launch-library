@@ -3,7 +3,7 @@ A simple python wrapper for the Launch Library web API.
 
 ##### Warning: The wrapper is not yet intended for general use.
 
-For now, usage is constricted to the "Launch" and "Agency" endpoints. Other models and richer support for existing ones will be added soon.
+Available models: Agency, AgencyType, Launch, Launch Status, Pad, Location 
 
 The usage of the API is simple.
 

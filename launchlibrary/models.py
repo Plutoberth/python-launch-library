@@ -94,6 +94,16 @@ class BaseModel:
         return "{}({})".format(subclass_name, variables)
 
 
+class AgencyType(BaseModel):
+    def __init__(self, api_instance: Api):
+        param_translations = dict(id="id", name="name", changed="changed")
+        proper_name = self.__class__.__name__
+        nested_name = "types"
+        endpoint_name = "agencytype"
+
+        super().__init__(endpoint_name, param_translations, nested_name, api_instance, proper_name)
+
+
 class Agency(BaseModel):
     def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", abbrev="abbrev", type="type", country_code="countryCode"
@@ -105,18 +115,20 @@ class Agency(BaseModel):
         super().__init__(endpoint_name, param_translations, nested_name, api_instance, proper_name)
 
     @lru_cache(maxsize=None)
-    def get_type(self):
+    def get_type(self) -> AgencyType:
         """Returns the name of the agency type."""
         agency_type = AgencyType.fetch(self.api_instance, id=self.type)
-        return agency_type[0] if len(agency_type) == 1 else None
+
+        # To avoid attribute errors on the user's side, if the type is not found simply create an empty one.
+        return agency_type[0] if len(agency_type) == 1 else AgencyType.init_from_json(self.api_instance, {})
 
 
-class AgencyType(BaseModel):
+class LaunchStatus(BaseModel):
     def __init__(self, api_instance: Api):
-        param_translations = dict(id="id", name="name", changed="changed")
+        param_translations = dict(id="id", name="name", description="description", changed="changed")
         proper_name = self.__class__.__name__
         nested_name = "types"
-        endpoint_name = "agencytype"
+        endpoint_name = "launchstatus"
 
         super().__init__(endpoint_name, param_translations, nested_name, api_instance, proper_name)
 
@@ -137,7 +149,7 @@ class Launch(BaseModel):
         super().__init__(endpoint_name, param_translations, nested_name, api_instance, proper_name)
 
     @classmethod
-    def next(cls, api_instance: Api, num: int):
+    def next(cls, api_instance: Api, num: int) -> list:
         """
         A simple abstraction method to get the next {num} launches.
         :param api_instance: An instance of launchlibrary.Api
@@ -146,7 +158,7 @@ class Launch(BaseModel):
         return cls.fetch(api_instance, next=num, status=1)
 
     @lru_cache(maxsize=None)
-    def get_agency(self):
+    def get_agency(self) -> Agency:
         """Gets the Agency model of the launch service provider either from json or from the server."""
         if self.api_instance.mode == "verbose" and self._lsp is not None:
             lsp = Agency.init_from_json(self.api_instance, self._lsp)
@@ -156,6 +168,14 @@ class Launch(BaseModel):
                 lsp = lsp[0]
 
         return lsp
+
+    @lru_cache(maxsize=None)
+    def get_status(self) -> LaunchStatus:
+        """Returns the LaunchStatus model for the corresponding status."""
+        launch_status = LaunchStatus.fetch(self.api_instance, id=self.status)
+
+        # To avoid attribute errors on the user's side, if the status is not found simply create an empty one.
+        return launch_status[0] if len(launch_status) == 1 else LaunchStatus.init_from_json(self.api_instance, {})
 
     def postprocess(self):
         """Changes times to the datetime format."""
