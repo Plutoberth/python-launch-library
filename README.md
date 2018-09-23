@@ -30,7 +30,7 @@ properties = launches[0].param_names
 
 ### Todo
 - [x] Tidy up the repository
-- [ ] Add exceptions to handle server timeout
+- [x] Add exceptions to handle server timeout
 - [x] Handle nested models (i.e. a Pad model inside a Location model inside a Launch model)
 - [x] Handle times with the datetime class
 - [x] Package properly and upload to PyPI
