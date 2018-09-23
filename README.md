@@ -9,6 +9,8 @@ The usage of the API is simple.
 
 ### Usage
 
+##### Proper documentation is available in [Read The Docs](https://python-launch-library.readthedocs.io/en/latest/).
+
 To install, simply use pip: ```pip install python-launch-library```
 
 ```python
