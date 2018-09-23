@@ -169,5 +169,5 @@ fabric.properties
 
 .idea/*
 
-launchlibrary/tests.py
+tests.py
 buildandupload.bat

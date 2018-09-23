@@ -21,7 +21,7 @@ DEFAULT_VERSION = "1.4"
 class Api:
     def __init__(self, mode="verbose", api_url=DEFAULT_API_URL, version=DEFAULT_VERSION):
         # CURRENTLY STUCK ON VERBOSE
-        self.mode = "verbose"  # Pick between verbose, list, and summary. Data decreases from verbose to summary.
+        self.mode = "verbose"  # Pick between verbose, list, and summary. Data decreases from verbose to list.
 
         # These probably shouldn't be changed unless the site changed its address. The wrapper may not work as well
         # with a different version than the default one.

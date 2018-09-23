@@ -17,6 +17,7 @@ from dateutil import parser
 from dateutil import relativedelta
 from functools import lru_cache
 import datetime
+from launchlibrary import Api
 
 # Set default dt to the beginning of next month
 DEFAULT_DT = datetime.datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0) \
@@ -26,7 +27,7 @@ DEFAULT_DT = datetime.datetime.now().replace(day=1, hour=0, minute=0, second=0, 
 class BaseModel:
     """A class representing the base model of all models. Should be "private"."""
 
-    def __init__(self, endpoint, param_translations, nested_name, api_instance, proper_name):
+    def __init__(self, endpoint: str, param_translations: dict, nested_name: str, api_instance: Api, proper_name: str):
         # param translations serves both for pythonic translations and default param values
         self.param_translations = param_translations
         self.endpoint = endpoint
@@ -36,7 +37,7 @@ class BaseModel:
         self.param_names = self.param_translations.keys()
 
     @classmethod
-    def fetch(cls, api_instance, **kwargs):
+    def fetch(cls, api_instance: Api, **kwargs) -> list:
         """Initializes a class, or even a list of them from the api using the needed params."""
         cls_init = cls(api_instance)
         json_object = api_instance.send_message(cls_init.endpoint, kwargs)
@@ -51,7 +52,7 @@ class BaseModel:
         return classes
 
     @classmethod
-    def init_from_json(cls, api_instance, json_object):
+    def init_from_json(cls, api_instance: Api, json_object: dict):
         """
         Initializes a class from a json object. Only singular classes.
         :param api_instance: launchlibrary.Api
@@ -63,8 +64,8 @@ class BaseModel:
         cls_init.postprocess()
         return cls_init
 
-    def set_params_json(self, json_object):
-        """Sets the parameters of a class from an object (raw data, not inside "agenices" for example)"""
+    def set_params_json(self, json_object: dict):
+        """Sets the parameters of a class from an object (raw data, not inside "agencies" for example)"""
         self.modelize(json_object)
         for pythonic_name, api_name in self.param_translations.items():
             setattr(self, pythonic_name, json_object.get(api_name, None))
@@ -86,7 +87,7 @@ class BaseModel:
         """Optional method. May be used for model specific operations (like purging times)."""
         pass
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         subclass_name = self.proper_name
         variables = ",".join(f"{k}={getattr(self, k)}" for k in self.param_translations.keys())
 
@@ -94,7 +95,7 @@ class BaseModel:
 
 
 class Agency(BaseModel):
-    def __init__(self, api_instance):
+    def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", abbrev="abbrev", type="type", country_code="countryCode"
                                   , wiki_url="wikiURL", info_urls="infoURLs", is_lsp="islsp", changed="changed")
         proper_name = self.__class__.__name__
@@ -111,7 +112,7 @@ class Agency(BaseModel):
 
 
 class AgencyType(BaseModel):
-    def __init__(self, api_instance):
+    def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", changed="changed")
         proper_name = self.__class__.__name__
         nested_name = "types"
@@ -121,7 +122,7 @@ class AgencyType(BaseModel):
 
 
 class Launch(BaseModel):
-    def __init__(self, api_instance):
+    def __init__(self, api_instance: Api):
         self.datetime_conversions = dict()
         param_translations = dict(id="id", name="name", tbddate="tbddate", tbdtime="tbdtime", status="status"
                                   , inhold="inhold", windowstart="isostart", windowend="isoend",
@@ -136,7 +137,7 @@ class Launch(BaseModel):
         super().__init__(endpoint_name, param_translations, nested_name, api_instance, proper_name)
 
     @classmethod
-    def next(cls, api_instance, num):
+    def next(cls, api_instance: Api, num: int):
         """
         A simple abstraction method to get the next {num} launches.
         :param api_instance: An instance of launchlibrary.Api
@@ -168,7 +169,7 @@ class Launch(BaseModel):
 
 
 class Pad(BaseModel):
-    def __init__(self, api_instance):
+    def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", pad_type="padType", latitude="latitude", longitude="longitude",
                                   map_url="mapURL", retired="retired", locationid="locationid", agencies="agencies",
                                   wiki_url="wikiURL", info_urls="infoURLs")
@@ -180,7 +181,7 @@ class Pad(BaseModel):
 
 
 class Location(BaseModel):
-    def __init__(self, api_instance):
+    def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", country_code="countrycode", wiki_url="wikiURL"
                                   , info_urls="infoURLs", pads="pads")  # pads might be included w/ launch endpoint
         proper_name = self.__class__.__name__
