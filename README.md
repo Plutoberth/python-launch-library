@@ -1,7 +1,7 @@
 # python-launch-library
 A simple python wrapper for the Launch Library web API.
 
-##### Warning: The wrapper is not yet intended for general use.
+[![PyPI Version](https://img.shields.io/pypi/v/python-launch-library.svg)](https://pypi.org/project/python-launch-library/) [![Documentation Status](https://readthedocs.org/projects/python-launch-library/badge/?version=latest)](https://python-launch-library.readthedocs.io/en/latest/?badge=latest)
 
 Available models: `Agency, AgencyType, Launch, Launch Status, Pad, Location, Rocket, RocketFamily`
 
