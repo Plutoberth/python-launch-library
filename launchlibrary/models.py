@@ -28,7 +28,6 @@ DEFAULT_DT = datetime.datetime.now().replace(day=1, hour=0, minute=0, second=0, 
 
 
 class BaseModel:
-
     def __init__(self, endpoint: str, param_translations: dict, nested_name: str, api_instance: Api, proper_name: str):
         """
         All launchlibrary models should inherit from this class. Contains utility and fetch functions.

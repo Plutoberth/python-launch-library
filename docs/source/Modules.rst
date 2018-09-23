@@ -17,6 +17,7 @@ Note that the wrapper only uses verbose mode.
 Additionally, the parameters of every model can be accessed post-creation by using `model.param_names`.
 
 .. automodule:: launchlibrary.models
+
     :members:
     :undoc-members:
     :show-inheritance:
