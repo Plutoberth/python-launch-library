@@ -34,8 +34,8 @@ properties = launches[0].param_names
 - [x] Handle nested models (i.e. a Pad model inside a Location model inside a Launch model)
 - [x] Handle times with the datetime class
 - [x] Package properly and upload to PyPI
-- [x] Add more abstraction methods for the api calls
-- [ ] Add magic method comparisons
+- [x] Add more abstraction methods for the api calls (open to suggestions)
+- [x] Add magic method comparisons (open to suggestions)
 - [ ] Asynchronous operation
 - [ ] Add tests
 - [ ] Your suggestion here

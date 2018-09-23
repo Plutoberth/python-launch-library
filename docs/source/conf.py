@@ -44,6 +44,9 @@ extensions = [
 	'sphinx_autodoc_typehints'
 ]
 
+# Change autodoc order to by source
+autodoc_member_order = "bysource"
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 

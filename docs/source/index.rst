@@ -7,8 +7,8 @@ Welcome to python-launch-library's documentation! This is a fairly simple librar
    :maxdepth: 2
 
    
-   Modules
    getting_started
+   Modules
    License
    
 First, visit the getting started page, and then feel free to proceed to the Modules page to learn about the rest of the wrapper.

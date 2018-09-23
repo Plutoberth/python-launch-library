@@ -202,7 +202,7 @@ class LaunchStatus(BaseModel):
 class Launch(BaseModel):
     """A class representing a launch object.
 
-    Comparison magic functions are implemented, that essentially compare dates.
+    The comparison magic methods that are implemented essentially compare the dates of the two objects.
 
     =========  ===========
     Operation  Description
@@ -248,7 +248,7 @@ class Launch(BaseModel):
         super().__init__(endpoint_name, param_translations, nested_name, api_instance, proper_name)
 
     @classmethod
-    def next(cls, api_instance: Api, num: int) -> list:
+    def next(cls, api_instance: Api, num: int) -> List["Launch"]:
         """
         A simple abstraction method to get the next {num} launches.
         :param api_instance: An instance of launchlibrary.Api
