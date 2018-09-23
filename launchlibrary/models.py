@@ -27,9 +27,17 @@ DEFAULT_DT = datetime.datetime.now().replace(day=1, hour=0, minute=0, second=0, 
 
 
 class BaseModel:
-    """A class representing the base model of all models. Should be "private"."""
 
     def __init__(self, endpoint: str, param_translations: dict, nested_name: str, api_instance: Api, proper_name: str):
+        """
+        A class representing the base model of all models. Contains functions to handle data.
+
+        :param endpoint: The endpoint to use in the api
+        :param param_translations:  Translations from API names to pythonic names.
+        :param nested_name:  The name of that will appear in nested results. "Agencies" and the such.
+        :param api_instance:  An instance of the Api class.
+        :param proper_name:  The proper name for use in __repr__
+        """
         # param translations serves both for pythonic translations and default param values
         self.param_translations = param_translations
         self.endpoint = endpoint
@@ -40,11 +48,16 @@ class BaseModel:
 
     @classmethod
     def fetch(cls, api_instance: Api, **kwargs) -> list:
-        """Initializes a class, or even a list of them from the api using the needed params."""
+        """
+        Initializes a class, or even a list of them from the api using the needed params.
+
+        :param api_instance: An instance of the Api class.
+        :param kwargs: Arguments to include in the GET request
+        """
 
         kwargs = utils.sanitize_input(kwargs)
         cls_init = cls(api_instance)
-        json_object = api_instance.send_message(cls_init.endpoint, kwargs)
+        json_object = api_instance._send_message(cls_init.endpoint, kwargs)
         classes = []
 
         for entry in json_object.get(cls_init.nested_name, []):
@@ -58,7 +71,8 @@ class BaseModel:
     @classmethod
     def init_from_json(cls, api_instance: Api, json_object: dict):
         """
-        Initializes a class from a json object. Only singular classes.
+        Initializes a class from a json object. Only single classes.
+
         :param api_instance: launchlibrary.Api
         :param json_object: An object containing the "entry" we want to init.
         :return: cls
@@ -113,6 +127,17 @@ class Agency(BaseModel):
     def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", abbrev="abbrev", type="type", country_code="countryCode"
                                   , wiki_url="wikiURL", info_urls="infoURLs", is_lsp="islsp", changed="changed")
+
+        self.id = None
+        self.name = None
+        self.abbrev = None
+        self.type = None
+        self.country_code = None
+        self.wiki_url = None
+        self.info_urls = None
+        self.is_lsp = None
+        self.changed = None
+
         proper_name = self.__class__.__name__
         nested_name = "agencies"
         endpoint_name = "agency"
@@ -135,6 +160,12 @@ class Agency(BaseModel):
 class LaunchStatus(BaseModel):
     def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", description="description", changed="changed")
+
+        self.id = None
+        self.name = None
+        self.description = None
+        self.changed = None
+
         proper_name = self.__class__.__name__
         nested_name = "types"
         endpoint_name = "launchstatus"
@@ -151,6 +182,28 @@ class Launch(BaseModel):
                                   vid_urls="vidURLs", holdreason="holdreason", failreason="failreason",
                                   probability="probability", hashtag="hashtag", _lsp="lsp", changed="changed",
                                   location="location", rocket="rocket", missions="missions")
+
+        self.id = None
+        self.name = None
+        self.tbddate = None
+        self.tbdtime = None
+        self.status = None
+        self.inhold = None
+        self.windowstart = None
+        self.windowend = None
+        self.net = None
+        self.info_urls = None
+        self.vid_urls = None
+        self.holdreason = None
+        self.failreason = None
+        self.probability = None
+        self.hashtag = None
+        self._lsp = None
+        self.changed = None
+        self.location = None
+        self.rocket = None
+        self.missions = None
+
         proper_name = self.__class__.__name__
         nested_name = "launches"
         endpoint_name = "launch"
@@ -210,6 +263,19 @@ class Pad(BaseModel):
         param_translations = dict(id="id", name="name", pad_type="padType", latitude="latitude", longitude="longitude",
                                   map_url="mapURL", retired="retired", locationid="locationid", agencies="agencies",
                                   wiki_url="wikiURL", info_urls="infoURLs")
+
+        self.id = None
+        self.name = None
+        self.pad_type = None
+        self.latitude = None
+        self.longitude = None
+        self.map_url = None
+        self.retired = None
+        self.locationid = None
+        self.agencies = None
+        self.wiki_url = None
+        self.info_urls = None
+
         proper_name = self.__class__.__name__
         nested_name = "pads"
         endpoint_name = "pad"
@@ -221,6 +287,14 @@ class Location(BaseModel):
     def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", country_code="countrycode", wiki_url="wikiURL"
                                   , info_urls="infoURLs", pads="pads")  # pads might be included w/ launch endpoint
+
+        self.id = None
+        self.name = None
+        self.country_code = None
+        self.wiki_url = None
+        self.info_urls = None
+        self.pads = None
+
         proper_name = self.__class__.__name__
         nested_name = "pads"
         endpoint_name = "pad"
@@ -231,6 +305,12 @@ class Location(BaseModel):
 class RocketFamily(BaseModel):
     def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", agencies="agencies", changed="changed")
+
+        self.id = None
+        self.name = None
+        self.agencies = None
+        self.changed = None
+
         proper_name = self.__class__.__name__
         nested_name = "RocketFamilies"
         endpoint_name = "rocketfamily"
@@ -243,6 +323,16 @@ class Rocket(BaseModel):
         param_translations = dict(id="id", name="name", default_pads="defaultPads", family="family",
                                   wiki_url="wikiURL", info_urls="infoURLs", image_url="imageURL"
                                   , image_sizes="imageSizes")
+
+        self.id = None
+        self.name = None
+        self.default_pads = None
+        self.family = None
+        self.wiki_url = None
+        self.info_urls = None
+        self.image_url = None
+        self.image_sizes = None
+
         proper_name = self.__class__.__name__
         nested_name = "rockets"
         endpoint_name = "rocket"

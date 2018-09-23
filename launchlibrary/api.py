@@ -21,12 +21,15 @@ DEFAULT_VERSION = "1.4"
 
 
 class Api:
-    def __init__(self, api_url=DEFAULT_API_URL, version=DEFAULT_VERSION, fail_silently=True, retries=5):
+    def __init__(self, api_url: str = DEFAULT_API_URL, version: str = DEFAULT_VERSION, fail_silently: bool = True,
+                 retries: int = 5):
         """
+        The API class for the launchlibrary module.
+
         :param api_url: The URL of the launchlibrary website.
         :param version: Version of the api
         :param fail_silently: Set to false to raise exceptions when they occur.
-        :param retries: The maximum amount of retries for requests that timed out.
+        :param retries: The maximum amount of retries for requests that time out.
         """
         # CURRENTLY STUCK ON VERBOSE
         self.mode = "verbose"  # Pick between verbose, list, and summary. Data decreases from verbose to list.
@@ -39,19 +42,20 @@ class Api:
 
         self.retries = retries
 
-    def parse_data(self, data: dict) -> str:
+    def _parse_data(self, data: dict) -> str:
         """
-        Parse data as get parameters.
-        :param data: A dictionary containing key value pairs
-        :return
+        Parse the data as GET parameters and return it.
+
+        :param data: A dictionary containing values for the api call.
+        :return: A proper GET param string
         """
         return "?mode={}&".format(self.mode) + "&".join([f"{k}={v}" for k, v in data.items()])
 
-    def dispatch(self, endpoint: str, data: dict) -> dict:
-        request_url = "/".join([self.url, endpoint]) + self.parse_data(data)
+    def _dispatch(self, endpoint: str, data: dict) -> dict:
+        request_url = "/".join([self.url, endpoint]) + self._parse_data(data)
         try:
             resp = requests.get(request_url)
-            if resp.status_code == 404: # If it didn't find anything
+            if resp.status_code == 404:  # If it didn't find anything
                 raise ll_exceptions.ApiException  # raise an api exception
             resp_dict = resp.json()
 
@@ -70,9 +74,10 @@ class Api:
 
         return resp_dict  # Returns a json style object of the response.
 
-    def send_message(self, endpoint:str, data: dict) -> dict:
+    def _send_message(self, endpoint: str, data: dict) -> dict:
         """
         A wrapper function for dispatch. Allows us to retry on timeouts.
+
         :param endpoint:  The api endpoint
         :param data:  A dict containing data for the request
         :return:  response dict.
@@ -81,10 +86,11 @@ class Api:
 
         while attempts >= 1:
             try:
-                resp = self.dispatch(endpoint, data)
+                resp = self._dispatch(endpoint, data)
                 break  # It will not reach this line if it gets a ConnectTimeout
             except requests.exceptions.ConnectTimeout:
                 attempts -= 1
+                if attempts == 0:
+                    resp = {}
 
         return resp
-
