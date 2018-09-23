@@ -18,10 +18,11 @@ setuptools.setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
         "Development Status :: 3 - Alpha",
-
+        "Programming Language :: Python :: 3.6"
     ],
     install_requires=[
         "requests",
         "python-dateutil"
-    ]
+    ],
+    python_requires='>=3.6'
 )
