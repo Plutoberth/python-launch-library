@@ -20,6 +20,7 @@ import datetime
 from typing import List
 from launchlibrary import Api
 from launchlibrary import utils
+import json
 
 # Set default dt to the beginning of next month
 DEFAULT_DT = datetime.datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0) \
@@ -39,12 +40,12 @@ class BaseModel:
         :param proper_name:  The proper name for use in __repr__
         """
         # param translations serves both for pythonic translations and default param values
-        self.param_translations = param_translations
+        self._param_translations = param_translations
         self.endpoint = endpoint
         self.nested_name = nested_name
         self.api_instance = api_instance
         self.proper_name = proper_name
-        self.param_names = self.param_translations.keys()
+        self.param_names = self._param_translations.keys()
 
     @classmethod
     def fetch(cls, api_instance: Api, **kwargs) -> list:
@@ -85,7 +86,7 @@ class BaseModel:
     def _set_params_json(self, json_object: dict):
         """Sets the parameters of a class from an object (raw data, not inside "agencies" for example)"""
         self._modelize(json_object)
-        for pythonic_name, api_name in self.param_translations.items():
+        for pythonic_name, api_name in self._param_translations.items():
             setattr(self, pythonic_name, json_object.get(api_name, None))
 
     def _modelize(self, json_object):
@@ -106,11 +107,19 @@ class BaseModel:
         """Optional method. May be used for model specific operations (like purging times)."""
         pass
 
+    def _get_all_params(self) -> dict:
+        return {k: getattr(self, k, None) for k in self.param_names}
+
     def __repr__(self) -> str:
         subclass_name = self.proper_name
-        variables = ",".join(f"{k}={getattr(self, k)}" for k in self.param_translations.keys())
-
+        variables = ",".join(f"{k}={v}" for k, v in self._get_all_params().items())
         return "{}({})".format(subclass_name, variables)
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+
+    def __hash__(self):
+        return hash(getattr(self, "id", None)) + hash(type(self))
 
 
 class AgencyType(BaseModel):
@@ -267,6 +276,15 @@ class Launch(BaseModel):
                 # The string might not contain a date, so we'll need to handle it with an empty datetime object.
                 setattr(self, time_name, DEFAULT_DT)
 
+    def __lt__(self, other: "Launch") -> bool: return self.net < other.net
+
+    def __gt__(self, other: "Launch") -> bool: return self.net > other.net
+
+    def __le__(self, other: "Launch") -> bool: return self.net <= other.net
+
+    def __ge__(self, other: "Launch") -> bool: return self.net >= other.net
+
+
 
 class Pad(BaseModel):
     """A class representing a pad object."""
@@ -369,5 +387,5 @@ class Rocket(BaseModel):
 
 # putting it at the end to load the classes first
 MODEL_LIST_PLURAL = {"agencies": Agency, "pads": Pad, "locations": Location
-                     , "rockets": Rocket, "families": RocketFamily}
+    , "rockets": Rocket, "families": RocketFamily}
 MODEL_LIST_SINGULAR = {"agency": Agency, "pad": Pad, "location": Location, "rocket": Rocket, "family": RocketFamily}
