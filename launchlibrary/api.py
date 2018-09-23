@@ -37,6 +37,8 @@ class Api:
 
         self.fail_silently = fail_silently
 
+        self.retries = retries
+
     def parse_data(self, data: dict) -> str:
         """
         Parse data as get parameters.
@@ -45,7 +47,7 @@ class Api:
         """
         return "?mode={}&".format(self.mode) + "&".join([f"{k}={v}" for k, v in data.items()])
 
-    def send_message(self, endpoint, data):
+    def dispatch(self, endpoint: str, data: dict) -> dict:
         request_url = "/".join([self.url, endpoint]) + self.parse_data(data)
         try:
             resp = requests.get(request_url)
@@ -55,10 +57,34 @@ class Api:
 
         except (requests.exceptions.RequestException, json.JSONDecodeError,
                 ll_exceptions.ApiException) as e:  # Catch all exceptions from the module
+
+            if isinstance(e, requests.exceptions.ConnectTimeout):
+                raise e  # We want to raise this error to allow send_message to retry.
+
             print(f"Failed while retrieving API details. \nRequest url: {request_url}")
-            if not self.fail_silently:
-                raise e
-            else:  # If it fails silently, it should just return an empty dictionary.
+            if self.fail_silently:
+                # If it should fail silently, it should just return an empty dictionary.
                 resp_dict = {}
+            else:
+                raise e
 
         return resp_dict  # Returns a json style object of the response.
+
+    def send_message(self, endpoint:str, data: dict) -> dict:
+        """
+        A wrapper function for dispatch. Allows us to retry on timeouts.
+        :param endpoint:  The api endpoint
+        :param data:  A dict containing data for the request
+        :return:  response dict.
+        """
+        attempts = self.retries
+
+        while attempts >= 1:
+            try:
+                resp = self.dispatch(endpoint, data)
+                break  # It will not reach this line if it gets a ConnectTimeout
+            except requests.exceptions.ConnectTimeout:
+                attempts -= 1
+
+        return resp
+
