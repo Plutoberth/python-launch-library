@@ -15,7 +15,8 @@
 # Unused at the moment. Will add exceptions later.
 
 
-class InitException(Exception):
-    def __init__(self, message="Models must be initialized from the init_from_json classmethod."):
-        # Call the base class constructor with the parameters it needs
+class ApiException(Exception):
+    def __init__(self, message="There was an unknown issue with the API. Please reevaluate your call."):
         super().__init__(message)
+
+
