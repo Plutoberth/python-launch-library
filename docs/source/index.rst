@@ -5,10 +5,11 @@ Welcome to python-launch-library's documentation! This is a fairly simple librar
 
 .. toctree::
    :maxdepth: 2
+
    
-   License
    Modules
    getting_started
+   License
    
 First, visit the getting started page, and then feel free to proceed to the Modules page to learn about the rest of the wrapper.
 

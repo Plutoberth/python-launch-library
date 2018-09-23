@@ -7,7 +7,7 @@ API
    :members:
    
    .. automethod:: __init__
-   
+
 Models
 ------
 
