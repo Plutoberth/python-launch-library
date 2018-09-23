@@ -74,13 +74,14 @@ class BaseModel:
     def modelize(self, json_object):
         """Recursively goes over the json object, looking for any compatible models. It'll be called again
         recursively, but in an indirect way."""
+
         for key, val in json_object.items():
             if key in MODEL_LIST_PLURAL.keys():
-                if val:
+                if val and isinstance(val, list):
                     if len(val) > 0:
                         json_object[key] = [MODEL_LIST_PLURAL[key].init_from_json(self.api_instance, r) for r in val]
             elif key in MODEL_LIST_SINGULAR.keys():  # if it is a singular
-                if val:
+                if val and isinstance(val, dict):
                     if len(val) > 0:
                         json_object[key] = MODEL_LIST_SINGULAR[key].init_from_json(self.api_instance, val)
 
