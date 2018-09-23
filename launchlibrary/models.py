@@ -14,7 +14,13 @@
 
 
 from dateutil import parser
+from dateutil import relativedelta
 from functools import lru_cache
+import datetime
+
+# Set default dt to the beginning of next month
+DEFAULT_DT = datetime.datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0) \
+             + relativedelta.relativedelta(months=1)
 
 
 class BaseModel:
@@ -151,10 +157,14 @@ class Launch(BaseModel):
         return lsp
 
     def postprocess(self):
-        """Implement relevant models."""
+        """Changes times to the datetime format."""
         for time_name in ["windowstart", "windowend", "net"]:
-            # Will need to modify this if we ever implement modes other than verbose
-            setattr(self, time_name, parser.parse(getattr(self, time_name, 0)))
+            try:
+                # Will need to modify this if we ever implement modes other than verbose
+                setattr(self, time_name, parser.parse(getattr(self, time_name, 0)))
+            except ValueError:
+                # The string might not contain a date, so we'll need to handle it with an empty datetime object.
+                setattr(self, time_name, DEFAULT_DT)
 
 
 class Pad(BaseModel):
