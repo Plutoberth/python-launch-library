@@ -17,6 +17,7 @@ from dateutil import parser
 from dateutil import relativedelta
 from functools import lru_cache
 import datetime
+from typing import List
 from launchlibrary import Api
 
 # Set default dt to the beginning of next month
@@ -211,5 +212,37 @@ class Location(BaseModel):
         super().__init__(endpoint_name, param_translations, nested_name, api_instance, proper_name)
 
 
-MODEL_LIST_PLURAL = {"agencies": Agency, "pads": Pad, "locations": Location}  # putting it at the end to load the class
-MODEL_LIST_SINGULAR = {"agency": Agency, "pad": Pad, "location": Location}
+class RocketFamily(BaseModel):
+    def __init__(self, api_instance: Api):
+        param_translations = dict(id="id", name="name", agencies="agencies", changed="changed")
+        proper_name = self.__class__.__name__
+        nested_name = "RocketFamilies"
+        endpoint_name = "rocketfamily"
+
+        super().__init__(endpoint_name, param_translations, nested_name, api_instance, proper_name)
+
+
+class Rocket(BaseModel):
+    def __init__(self, api_instance: Api):
+        param_translations = dict(id="id", name="name", default_pads="defaultPads", family="family",
+                                  wiki_url="wikiURL", info_urls="infoURLs", image_url="imageURL"
+                                  , image_sizes="imageSizes")
+        proper_name = self.__class__.__name__
+        nested_name = "rockets"
+        endpoint_name = "rocket"
+
+        super().__init__(endpoint_name, param_translations, nested_name, api_instance, proper_name)
+
+    @lru_cache(maxsize=None)
+    def get_pads(self) -> List[Pad]:
+        """Returns objects of the rocket's pads."""
+        if getattr(self, "default_pads", None):
+            pad_objs = Pad.fetch(self.api_instance, id=self.default_pads)
+            return pad_objs if pad_objs else []  # Make sure to obey types
+        else:
+            return []
+
+
+# putting it at the end to load the classes first
+MODEL_LIST_PLURAL = {"agencies": Agency, "pads": Pad, "locations": Location, "rockets": Rocket}
+MODEL_LIST_SINGULAR = {"agency": Agency, "pad": Pad, "location": Location, "rocket": Rocket, "family": RocketFamily}
