@@ -7,5 +7,4 @@ Welcome to python-launch-library's documentation! This is a fairly simple librar
    :maxdepth: 2
    
    License
-   API
-   Models
+   Modules

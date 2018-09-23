@@ -30,7 +30,7 @@ class BaseModel:
 
     def __init__(self, endpoint: str, param_translations: dict, nested_name: str, api_instance: Api, proper_name: str):
         """
-        A class representing the base model of all models. Contains functions to handle data.
+        All launchlibrary models should inherit from this class. Contains utility and fetch functions.
 
         :param endpoint: The endpoint to use in the api
         :param param_translations:  Translations from API names to pythonic names.
@@ -89,8 +89,8 @@ class BaseModel:
             setattr(self, pythonic_name, json_object.get(api_name, None))
 
     def modelize(self, json_object):
-        """Recursively goes over the json object, looking for any compatible models. It'll be called again
-        recursively, but in an indirect way."""
+        """Recursively goes over the json object, looking for any compatible models. It's recursive in an indirect
+        way (through set_params_json)."""
 
         for key, val in json_object.items():
             if key in MODEL_LIST_PLURAL.keys():
@@ -116,6 +116,11 @@ class BaseModel:
 class AgencyType(BaseModel):
     def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", changed="changed")
+
+        self.id = None
+        self.name = None
+        self.changed = None
+
         proper_name = self.__class__.__name__
         nested_name = "types"
         endpoint_name = "agencytype"
@@ -173,7 +178,15 @@ class LaunchStatus(BaseModel):
 
 
 class Launch(BaseModel):
-    def __init__(self, api_instance: Api):
+    def __init__(self, api_instance: Api, test):
+        """
+        something
+
+        :param api_instance:
+        :param test: yes
+        """
+
+        self.test = test
         self.datetime_conversions = dict()
         param_translations = dict(id="id", name="name", tbddate="tbddate", tbdtime="tbdtime", status="status"
                                   , inhold="inhold", windowstart="isostart", windowend="isoend",
