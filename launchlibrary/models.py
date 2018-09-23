@@ -27,6 +27,15 @@ DEFAULT_DT = datetime.datetime.now().replace(day=1, hour=0, minute=0, second=0, 
 
 
 class BaseModel:
+    """The base model class all models should inherit from. Provides fetch and other utility functionalities.
+
+    =========  ===========
+    Operation  Description
+    ---------  -----------
+    x == y     Checks if both objects are of the same type and have the same id.
+    =========  ===========
+    """
+
     def __init__(self, endpoint: str, param_translations: dict, nested_name: str, api_instance: Api, proper_name: str):
         """
         All launchlibrary models should inherit from this class. Contains utility and fetch functions.
@@ -191,7 +200,16 @@ class LaunchStatus(BaseModel):
 
 
 class Launch(BaseModel):
-    """A class representing a launch object."""
+    """A class representing a launch object.
+
+    Comparison magic functions are implemented, that essentially compare dates.
+
+    =========  ===========
+    Operation  Description
+    ---------  -----------
+    x < y      Checks if launch y occurs before launch y.
+    x > y      Checks if launch x occurs before launch y.
+    =========  ==========="""
 
     def __init__(self, api_instance: Api):
         self.datetime_conversions = dict()
@@ -277,11 +295,6 @@ class Launch(BaseModel):
     def __lt__(self, other: "Launch") -> bool: return self.net < other.net
 
     def __gt__(self, other: "Launch") -> bool: return self.net > other.net
-
-    def __le__(self, other: "Launch") -> bool: return self.net <= other.net
-
-    def __ge__(self, other: "Launch") -> bool: return self.net >= other.net
-
 
 
 class Pad(BaseModel):
