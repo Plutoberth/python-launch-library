@@ -19,6 +19,7 @@ from functools import lru_cache
 import datetime
 from typing import List
 from launchlibrary import Api
+from launchlibrary import utils
 
 # Set default dt to the beginning of next month
 DEFAULT_DT = datetime.datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0) \
@@ -40,6 +41,8 @@ class BaseModel:
     @classmethod
     def fetch(cls, api_instance: Api, **kwargs) -> list:
         """Initializes a class, or even a list of them from the api using the needed params."""
+
+        kwargs = utils.sanitize_input(kwargs)
         cls_init = cls(api_instance)
         json_object = api_instance.send_message(cls_init.endpoint, kwargs)
         classes = []
