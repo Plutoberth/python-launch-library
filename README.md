@@ -3,7 +3,7 @@ A simple python wrapper for the Launch Library web API.
 
 ##### Warning: The wrapper is not yet intended for general use.
 
-Available models: Agency, AgencyType, Launch, Launch Status, Pad, Location 
+Available models: `Agency, AgencyType, Launch, Launch Status, Pad, Location, Rocket, RocketFamily`
 
 The usage of the API is simple.
 
@@ -27,7 +27,7 @@ properties = launches[0].param_names
 ```
 
 ### Todo
-- [ ] Tidy up the repository
+- [x] Tidy up the repository
 - [ ] Add exceptions to handle server timeout
 - [x] Handle nested models (i.e. a Pad model inside a Location model inside a Launch model)
 - [x] Handle times with the datetime class
