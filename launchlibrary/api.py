@@ -49,7 +49,7 @@ class Api:
         :param data: A dictionary containing values for the api call.
         :return: A proper GET param string
         """
-        return "?mode={}&".format(self.mode) + "&".join([f"{k}={v}" for k, v in data.items()])
+        return "?mode={}&".format(self.mode) + "&".join(["{}={}".format(k, v) for k, v in data.items()])
 
     def _dispatch(self, endpoint: str, data: dict) -> dict:
         request_url = "/".join([self.url, endpoint]) + self._parse_data(data)
@@ -65,7 +65,7 @@ class Api:
             if isinstance(e, requests.exceptions.ConnectTimeout):
                 raise e  # We want to raise this error to allow send_message to retry.
 
-            print(f"Failed while retrieving API details. \nRequest url: {request_url}")
+            print("Failed while retrieving API details. \nRequest url: {}".format(request_url))
             if self.fail_silently:
                 # If it should fail silently, it should just return an empty dictionary.
                 resp_dict = {}
