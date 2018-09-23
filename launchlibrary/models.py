@@ -119,7 +119,11 @@ class Agency(BaseModel):
     @lru_cache(maxsize=None)
     def get_type(self) -> AgencyType:
         """Returns the name of the agency type."""
-        agency_type = AgencyType.fetch(self.api_instance, id=self.type)
+        type_id = getattr(self, "type", None)
+        if type_id:
+            agency_type = AgencyType.fetch(self.api_instance, id=type_id)
+        else:
+            agency_type = []
 
         # To avoid attribute errors on the user's side, if the type is not found simply create an empty one.
         return agency_type[0] if len(agency_type) == 1 else AgencyType.init_from_json(self.api_instance, {})
@@ -162,19 +166,27 @@ class Launch(BaseModel):
     @lru_cache(maxsize=None)
     def get_agency(self) -> Agency:
         """Gets the Agency model of the launch service provider either from json or from the server."""
-        if self.api_instance.mode == "verbose" and self._lsp is not None:
-            lsp = Agency.init_from_json(self.api_instance, self._lsp)
+        _lsp = getattr(self, "_lsp", None)
+        if _lsp:
+            if self.api_instance.mode == "verbose" and isinstance(_lsp, dict):
+                lsp = Agency.init_from_json(self.api_instance, _lsp)
+            else:
+                lsp = Agency.fetch(self.api_instance, id=_lsp)
+                if len(lsp) > 0:
+                    lsp = lsp[0]
         else:
-            lsp = Agency.fetch(self.api_instance, id=self._lsp)
-            if len(lsp) > 0:
-                lsp = lsp[0]
+            lsp = Agency.init_from_json(self.api_instance, {})  # Init an empty model to prevent errors
 
         return lsp
 
     @lru_cache(maxsize=None)
     def get_status(self) -> LaunchStatus:
         """Returns the LaunchStatus model for the corresponding status."""
-        launch_status = LaunchStatus.fetch(self.api_instance, id=self.status)
+        status = getattr(self, "status", None)
+        if status:
+            launch_status = LaunchStatus.fetch(self.api_instance, id=status)
+        else:
+            launch_status = []  # to let the ternary init an empty model
 
         # To avoid attribute errors on the user's side, if the status is not found simply create an empty one.
         return launch_status[0] if len(launch_status) == 1 else LaunchStatus.init_from_json(self.api_instance, {})
@@ -237,13 +249,16 @@ class Rocket(BaseModel):
     @lru_cache(maxsize=None)
     def get_pads(self) -> List[Pad]:
         """Returns objects of the rocket's pads."""
-        if getattr(self, "default_pads", None):
-            pad_objs = Pad.fetch(self.api_instance, id=self.default_pads)
+        default_pads = getattr(self, "default_pads", None)
+        if default_pads:
+            pad_objs = Pad.fetch(self.api_instance, id=default_pads)
             return pad_objs if pad_objs else []  # Make sure to obey types
         else:
             return []
 
 
 # putting it at the end to load the classes first
+
+
 MODEL_LIST_PLURAL = {"agencies": Agency, "pads": Pad, "locations": Location, "rockets": Rocket}
 MODEL_LIST_SINGULAR = {"agency": Agency, "pad": Pad, "location": Location, "rocket": Rocket, "family": RocketFamily}
