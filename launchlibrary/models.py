@@ -29,8 +29,8 @@ DEFAULT_DT = datetime.datetime.now().replace(day=1, hour=0, minute=0, second=0, 
 class BaseModel:
     """The base model class all models should inherit from. Provides fetch and other utility functionalities.
 
-    :endpoint: The endpoint to use in the api
-    :nested_name:  The name of that will appear in nested results. "Agencies" and the such.
+    :_endpoint_name: The endpoint to use in the api
+    :_nested_name:  The name of that will appear in nested results. "Agencies" and the such.
 
     =========  ===========
     Operation  Description
@@ -39,16 +39,14 @@ class BaseModel:
     =========  ===========
     """
 
-    endpoint_name = ""
-    nested_name = ""
+    _endpoint_name = ""
+    _nested_name = ""
 
     def __init__(self, param_translations: dict, api_instance: Api, proper_name: str):
         """
         All launchlibrary models should inherit from this class. Contains utility and fetch functions.
 
-
         :param param_translations:  Translations from API names to pythonic names.
-
         :param api_instance:  An instance of the Api class.
         :param proper_name:  The proper name for use in __repr__
         """
@@ -69,7 +67,7 @@ class BaseModel:
 
         kwargs = utils.sanitize_input(kwargs)
 
-        json_object = api_instance._send_message(cls.endpoint_name, kwargs)
+        json_object = api_instance._send_message(cls._endpoint_name, kwargs)
 
         classes = cls._create_classes(api_instance, json_object)
 
@@ -86,7 +84,7 @@ class BaseModel:
         """
 
         classes = []
-        for entry in json_object.get(cls.nested_name, []):
+        for entry in json_object.get(cls._nested_name, []):
             cls_init = cls(api_instance)
             cls_init._set_params_json(entry)
             cls_init._postprocess()
@@ -149,8 +147,8 @@ class BaseModel:
 
 class AgencyType(BaseModel):
     """A class representing an agency type object."""
-    nested_name = "types"
-    endpoint_name = "agencytype"
+    _nested_name = "types"
+    _endpoint_name = "agencytype"
 
     def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", changed="changed")
@@ -167,8 +165,8 @@ class AgencyType(BaseModel):
 class Agency(BaseModel):
     """A class representing an agency object."""
 
-    nested_name = "agencies"
-    endpoint_name = "agency"
+    _nested_name = "agencies"
+    _endpoint_name = "agency"
 
     def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", abbrev="abbrev", type="type", country_code="countryCode"
@@ -203,8 +201,8 @@ class Agency(BaseModel):
 class LaunchStatus(BaseModel):
     """A class representing a launch status object."""
 
-    nested_name = "types"
-    endpoint_name = "launchstatus"
+    _nested_name = "types"
+    _endpoint_name = "launchstatus"
 
     def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", description="description", changed="changed")
@@ -231,8 +229,8 @@ class Launch(BaseModel):
     x > y      Checks if launch x occurs before launch y.
     =========  ==========="""
 
-    nested_name = "launches"
-    endpoint_name = "launch"
+    _nested_name = "launches"
+    _endpoint_name = "launch"
 
     def __init__(self, api_instance: Api):
         self.datetime_conversions = dict()
@@ -323,8 +321,8 @@ class Launch(BaseModel):
 class Pad(BaseModel):
     """A class representing a pad object."""
 
-    nested_name = "pads"
-    endpoint_name = "pad"
+    _nested_name = "pads"
+    _endpoint_name = "pad"
 
     def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", pad_type="padType", latitude="latitude", longitude="longitude",
@@ -351,8 +349,8 @@ class Pad(BaseModel):
 class Location(BaseModel):
     """A class representing a location object."""
 
-    nested_name = "locations"
-    endpoint_name = "location"
+    _nested_name = "locations"
+    _endpoint_name = "location"
 
     def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", country_code="countrycode", wiki_url="wikiURL"
@@ -373,8 +371,8 @@ class Location(BaseModel):
 class RocketFamily(BaseModel):
     """A class representing a rocket family object."""
 
-    nested_name = "RocketFamilies"
-    endpoint_name = "rocketfamily"
+    _nested_name = "RocketFamilies"
+    _endpoint_name = "rocketfamily"
 
     def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", agencies="agencies", changed="changed")
@@ -392,8 +390,8 @@ class RocketFamily(BaseModel):
 class Rocket(BaseModel):
     """A class representing a rocket object."""
 
-    nested_name = "rockets"
-    endpoint_name = "rocket"
+    _nested_name = "rockets"
+    _endpoint_name = "rocket"
 
     def __init__(self, api_instance: Api):
         param_translations = dict(id="id", name="name", default_pads="defaultPads", family="family",
