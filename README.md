@@ -1,5 +1,5 @@
 # python-launch-library
-A simple python wrapper for the Launch Library web API.
+A simple python wrapper for the Launch Library web API. Can also be used asynchronously too.
 
 [![PyPI Version](https://img.shields.io/pypi/v/python-launch-library.svg)](https://pypi.org/project/python-launch-library/) [![Documentation Status](https://readthedocs.org/projects/python-launch-library/badge/?version=latest)](https://python-launch-library.readthedocs.io/en/latest/?badge=latest)
 
@@ -36,7 +36,7 @@ properties = launches[0].param_names
 - [x] Package properly and upload to PyPI
 - [x] Add more abstraction methods for the api calls (open to suggestions)
 - [x] Add magic method comparisons (open to suggestions)
-- [ ] Asynchronous operation
+- [x] Asynchronous operation
 - [ ] Add tests
 - [ ] Your suggestion here
 

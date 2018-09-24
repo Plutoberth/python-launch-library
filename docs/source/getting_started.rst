@@ -14,7 +14,7 @@ The python-launch-library module only supports Python 3.6 and above. If your ins
 Usage
 -----
   
-Usage of the API is simple.
+Usage of the wrapper is simple.
 
 .. code:: py
 
@@ -38,5 +38,30 @@ Usage of the API is simple.
   
   # Some properties, like agency, mandate the use of special methods, as their availability is not guaranteed or represented as an id only.
   launch_agency = next_5_go_launches[0].get_agency()
+  
+
+Asynchronous Usage
+------------------
+
+.. code:: py
+
+  # First import the library and the asyncio module
+  import launchlibrary as ll
+  import asyncio
+  
+  # Then initialize an API object
+  api = ll.Api()
+  
+  # Get an event loop
+  event_loop = asyncio.get_event_loop()
+  
+  # And fetch using the Async models.
+  next_5_go_launches = event_loop.run_until_complete(ll.AsyncLaunch.next(api, 5))
+  
+  # Note that all API facing methods are now asynchronous, so you must await all of them.
+  status = event_loop.run_until_complete(next_5_go_launches[0].get_status())
+  
+
+
   
   

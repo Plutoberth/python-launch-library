@@ -21,5 +21,16 @@ Additionally, the parameters of every model can be accessed post-creation by usi
    :undoc-members:
    :show-inheritance:
 
+Asynchronous Models
+-------------------
+
+The library also supports asynchronous operation. To receive proper coroutines, just prepend Async to the name of the class.
+
+.. automodule:: launchlibrary.async_models
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
 
 	
