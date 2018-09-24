@@ -22,7 +22,8 @@ setuptools.setup(
     ],
     install_requires=[
         "requests",
-        "python-dateutil"
+        "python-dateutil",
+        "aiohttp"
     ],
     python_requires='>=3.6'
 )

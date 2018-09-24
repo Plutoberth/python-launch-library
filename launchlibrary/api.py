@@ -15,6 +15,7 @@
 import requests
 import json
 from launchlibrary import exceptions as ll_exceptions
+import aiohttp
 
 DEFAULT_API_URL = "https://launchlibrary.net"
 DEFAULT_VERSION = "1.4"
@@ -42,17 +43,18 @@ class Api:
 
         self.retries = retries
 
-    def _parse_data(self, data: dict) -> str:
+    def _get_url(self, endpoint, data: dict) -> str:
         """
-        Parse the data as GET parameters and return it.
+        Parse the data as GET parameters and return it as a proper request url.
 
         :param data: A dictionary containing values for the api call.
         :return: A proper GET param string
         """
-        return "?mode={}&".format(self.mode) + "&".join(["{}={}".format(k, v) for k, v in data.items()])
+        params = "?mode={}&".format(self.mode) + "&".join(["{}={}".format(k, v) for k, v in data.items()])
+        return "/".join([self.url, endpoint]) + params
 
     def _dispatch(self, endpoint: str, data: dict) -> dict:
-        request_url = "/".join([self.url, endpoint]) + self._parse_data(data)
+        request_url = self._get_url(endpoint, data)
         try:
             resp = requests.get(request_url)
             if resp.status_code == 404:  # If it didn't find anything
@@ -74,7 +76,7 @@ class Api:
 
         return resp_dict  # Returns a json style object of the response.
 
-    def _send_message(self, endpoint: str, data: dict) -> dict:
+    def send_message(self, endpoint: str, data: dict) -> dict:
         """
         A wrapper function for dispatch. Allows us to retry on timeouts.
 
@@ -83,6 +85,7 @@ class Api:
         :return:  response dict.
         """
         attempts = self.retries
+        resp = {}
 
         while attempts >= 1:
             try:
@@ -90,7 +93,51 @@ class Api:
                 break  # It will not reach this line if it gets a ConnectTimeout
             except requests.exceptions.ConnectTimeout:
                 attempts -= 1
-                if attempts == 0:
-                    resp = {}
+
+        return resp
+
+    # I know that having two completely separate functions is messy, but it was necessary.
+    async def _async_dispatch(self, endpoint: str, data: dict) -> dict:
+        request_url = self._get_url(endpoint, data)
+        try:
+            async with aiohttp.ClientSession() as sess:
+                async with sess.get(request_url) as resp:
+                    resp_dict = await resp.json()
+
+            if resp.status == 404:  # If it didn't find anything
+                raise ll_exceptions.ApiException  # raise an api exception
+
+        except (aiohttp.ClientError, json.JSONDecodeError,
+                ll_exceptions.ApiException) as e:  # Catch all exceptions from the module
+
+            if isinstance(e, aiohttp.ClientTimeoutError):
+                raise e  # We want to raise this error to allow send_message to retry.
+
+            print("Failed while retrieving API details. \nRequest url: {}".format(request_url))
+            if self.fail_silently:
+                # If it should fail silently, it should just return an empty dictionary.
+                resp_dict = {}
+            else:
+                raise e
+
+        return resp_dict  # Returns a json style object of the response.
+
+    async def async_send_message(self, endpoint: str, data: dict):
+        """
+        A wrapper function for _async_dispatch. Allows us to retry on timeouts with async.
+
+        :param endpoint:  The api endpoint
+        :param data:  A dict containing data for the request
+        :return:  response dict.
+        """
+        attempts = self.retries
+        resp = {}
+
+        while attempts >= 1:
+            try:
+                resp = await self._async_dispatch(endpoint, data)
+                break  # It will not reach this line if it gets a ConnectTimeout
+            except aiohttp.ClientTimeoutError:
+                attempts -= 1
 
         return resp
