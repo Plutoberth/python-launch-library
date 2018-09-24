@@ -276,21 +276,6 @@ class Launch(BaseModel):
         return cls.fetch(api_instance, next=num, status=1)
 
     @lru_cache(maxsize=None)
-    def get_agency(self) -> Agency:
-        """Gets the Agency model of the launch service provider either from the response or from the server."""
-        if self._lsp:
-            if self.api_instance.mode == "verbose" and isinstance(self._lsp, dict):
-                lsp = Agency.init_from_json(self.api_instance, self._lsp)
-            else:
-                lsp = Agency.fetch(self.api_instance, id=self._lsp)
-                if len(lsp) > 0:
-                    lsp = lsp[0]
-        else:
-            lsp = Agency.init_from_json(self.api_instance, {})  # Init an empty model to prevent errors
-
-        return lsp
-
-    @lru_cache(maxsize=None)
     def get_status(self) -> LaunchStatus:
         """Returns the LaunchStatus model for the corresponding status."""
         if self.status:
@@ -424,4 +409,5 @@ class Rocket(BaseModel):
 # putting it at the end to load the classes first
 MODEL_LIST_PLURAL = {"agencies": Agency, "pads": Pad, "locations": Location
                      , "rockets": Rocket, "families": RocketFamily}
-MODEL_LIST_SINGULAR = {"agency": Agency, "pad": Pad, "location": Location, "rocket": Rocket, "family": RocketFamily}
+MODEL_LIST_SINGULAR = {"agency": Agency, "pad": Pad, "location": Location, "rocket": Rocket, "family": RocketFamily,
+                       "lsp": Agency}
