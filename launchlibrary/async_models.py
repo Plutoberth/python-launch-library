@@ -45,7 +45,58 @@ class asyncAgency(BaseAsync, Agency):
         return agency_type[0] if len(agency_type) == 1 else AgencyType.init_from_json(self.api_instance, {})
 
 
-class AsyncLaunchStatus(BaseAsync, Agency):
-    """A class representing an async lauch status object."""
+class AsyncLaunchStatus(BaseAsync, LaunchStatus):
+    """A class representing an async launch status object."""
     pass
 
+
+class AsyncLaunch(BaseAsync, Launch):
+    """A class representing an async launch object."""
+
+    @classmethod
+    async def next(cls, api_instance: Api, num: int):
+        """
+        A simple abstraction method to get the next {num} launches.
+        :param api_instance: An instance of launchlibrary.Api
+        :param num: a number for the number of launches
+        """
+        return await cls.fetch(api_instance, next=num, status=1)
+
+    @lru_cache(maxsize=None)
+    async def get_status(self) -> LaunchStatus:
+        """Returns the LaunchStatus model for the corresponding status."""
+        if self.status:
+            launch_status = LaunchStatus.fetch(self.api_instance, id=self.status)
+        else:
+            launch_status = []  # to let the ternary init an empty model
+
+        # To avoid attribute errors on the user's side, if the status is not found simply create an empty one.
+        return launch_status[0] if len(launch_status) == 1 else LaunchStatus.init_from_json(self.api_instance, {})
+
+
+class AsyncPad(BaseAsync, Pad):
+    """A class representing an async pad object."""
+    pass
+
+
+class AsyncLocation(BaseAsync, Location):
+    """A class representing an async Location object."""
+    pass
+
+
+class AsyncRocketFamily(BaseAsync, RocketFamily):
+    """A class representing an async rocket family."""
+    pass
+
+
+class AsyncRocket(BaseAsync, Rocket):
+    """A class representing an async rocket."""
+
+    @lru_cache(maxsize=None)
+    async def get_pads(self) -> List[AsyncPad]:
+        """Returns Pad type objects of the pads the rocket uses."""
+        pad_objs = []
+        if self.default_pads:
+            pad_objs = await AsyncPad.fetch(self.api_instance, id=self.default_pads)
+
+        return pad_objs

@@ -16,4 +16,4 @@ from .api import Api
 from .models import *
 from .exceptions import *
 from .utils import *
-from .async_models import asyncAgency
+from .async_models import *
