@@ -398,11 +398,11 @@ class Rocket(BaseModel):
     @lru_cache(maxsize=None)
     def get_pads(self) -> List[Pad]:
         """Returns Pad type objects of the pads the rocket uses."""
+        pad_objs = []
         if self.default_pads:
             pad_objs = Pad.fetch(self.api_instance, id=self.default_pads)
-            return pad_objs if pad_objs else []  # Make sure to obey types
-        else:
-            return []
+
+        return pad_objs
 
 
 # putting it at the end to load the classes first

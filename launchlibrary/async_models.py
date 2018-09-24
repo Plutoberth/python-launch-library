@@ -4,8 +4,9 @@ from functools import lru_cache
 
 
 class BaseAsync(BaseModel):
-    def __init__(self, *args):
-        super().__init__(args)
+    def __init__(self,  param_translations: dict, api_instance: Api, proper_name: str):
+        # Gotta use explicit params for it to work correctly
+        super().__init__(param_translations, api_instance, proper_name)
 
     @classmethod
     async def fetch(cls, api_instance: Api, **kwargs):
@@ -32,7 +33,7 @@ class AsyncAgencyType(AgencyType, BaseAsync):
     pass
 
 
-class asyncAgency(BaseAsync, Agency):
+class AsyncAgency(Agency, BaseAsync):
     """A class representing an async agency object."""
 
     @lru_cache(maxsize=None)
@@ -45,12 +46,12 @@ class asyncAgency(BaseAsync, Agency):
         return agency_type[0] if len(agency_type) == 1 else AgencyType.init_from_json(self.api_instance, {})
 
 
-class AsyncLaunchStatus(BaseAsync, LaunchStatus):
+class AsyncLaunchStatus(LaunchStatus, BaseAsync):
     """A class representing an async launch status object."""
     pass
 
 
-class AsyncLaunch(BaseAsync, Launch):
+class AsyncLaunch(Launch, BaseAsync):
     """A class representing an async launch object."""
 
     @classmethod
@@ -74,22 +75,22 @@ class AsyncLaunch(BaseAsync, Launch):
         return launch_status[0] if len(launch_status) == 1 else LaunchStatus.init_from_json(self.api_instance, {})
 
 
-class AsyncPad(BaseAsync, Pad):
+class AsyncPad(Pad, BaseAsync):
     """A class representing an async pad object."""
     pass
 
 
-class AsyncLocation(BaseAsync, Location):
+class AsyncLocation(Location, BaseAsync):
     """A class representing an async Location object."""
     pass
 
 
-class AsyncRocketFamily(BaseAsync, RocketFamily):
+class AsyncRocketFamily(RocketFamily, BaseAsync):
     """A class representing an async rocket family."""
     pass
 
 
-class AsyncRocket(BaseAsync, Rocket):
+class AsyncRocket(Rocket, BaseAsync):
     """A class representing an async rocket."""
 
     @lru_cache(maxsize=None)
