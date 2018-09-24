@@ -67,7 +67,7 @@ class BaseModel:
 
         kwargs = utils.sanitize_input(kwargs)
 
-        json_object = api_instance._send_message(cls._endpoint_name, kwargs)
+        json_object = api_instance.send_message(cls._endpoint_name, kwargs)
 
         classes = cls._create_classes(api_instance, json_object)
 
@@ -188,7 +188,6 @@ class Agency(BaseModel):
 
     @lru_cache(maxsize=None)
     def get_type(self) -> AgencyType:
-        """Returns the name of the agency type."""
         if self.type:
             agency_type = AgencyType.fetch(self.api_instance, id=self.type)
         else:
@@ -238,7 +237,7 @@ class Launch(BaseModel):
                                   , inhold="inhold", windowstart="isostart", windowend="isoend",
                                   net="isonet", info_urls="infoURLs",
                                   vid_urls="vidURLs", holdreason="holdreason", failreason="failreason",
-                                  probability="probability", hashtag="hashtag", _lsp="lsp", changed="changed",
+                                  probability="probability", hashtag="hashtag", agency="lsp", changed="changed",
                                   location="location", rocket="rocket", missions="missions")
 
         self.id = None
@@ -408,6 +407,6 @@ class Rocket(BaseModel):
 
 # putting it at the end to load the classes first
 MODEL_LIST_PLURAL = {"agencies": Agency, "pads": Pad, "locations": Location
-                     , "rockets": Rocket, "families": RocketFamily}
+    , "rockets": Rocket, "families": RocketFamily}
 MODEL_LIST_SINGULAR = {"agency": Agency, "pad": Pad, "location": Location, "rocket": Rocket, "family": RocketFamily,
                        "lsp": Agency}
