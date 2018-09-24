@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="python-launch-library",
-    version="0.5",
+    version="0.5.1",
     author="Nir Harel",
     author_email="nir@nirharel.space",
     description="A wrapper for the launchlibrary.net API",
@@ -17,7 +17,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 3.6"
     ],
     install_requires=[
