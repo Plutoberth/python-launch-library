@@ -57,7 +57,7 @@ class Api:
         request_url = self._get_url(endpoint, data)
         try:
             resp = requests.get(request_url)
-            if resp.status_code == 404:  # If it didn't find anything
+            if resp.status_code != 200:  # If the request failed for some reason
                 raise ll_exceptions.ApiException  # raise an api exception
             resp_dict = resp.json()
 
@@ -104,7 +104,7 @@ class Api:
                 async with sess.get(request_url) as resp:
                     resp_dict = await resp.json()
 
-            if resp.status == 404:  # If it didn't find anything
+            if resp.status != 200:  # If the request failed for some reason
                 raise ll_exceptions.ApiException  # raise an api exception
 
         except (aiohttp.ClientError, json.JSONDecodeError,
