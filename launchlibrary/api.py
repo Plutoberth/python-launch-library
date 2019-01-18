@@ -29,7 +29,7 @@ class Api:
 
         :param api_url: The URL of the launchlibrary website.
         :param version: Version of the api
-        :param fail_silently: Set to false to raise exceptions when they occur.
+        :param fail_silently: Set to false to raise exceptions when they occur. Useful for debugging.
         :param retries: The maximum amount of retries for requests that time out.
         :param unicode: Set to False to convert unicode characters to ASCII using unidecode.
         """
@@ -58,7 +58,10 @@ class Api:
         try:
             resp = requests.get(request_url)
             if resp.status_code != 200:  # If the request failed for some reason
-                raise ll_exceptions.ApiException  # raise an api exception
+                raise ll_exceptions.ApiException(
+                    "API call to `{}` responded with code `{}`\n"
+                    "Complete API response: `{}`".format(request_url, resp.status_code, resp.text)
+                )  # raise an api exception
             resp_dict = resp.json()
 
         except (requests.exceptions.RequestException, json.JSONDecodeError,
@@ -67,7 +70,6 @@ class Api:
             if isinstance(e, requests.exceptions.ConnectTimeout):
                 raise e  # We want to raise this error to allow send_message to retry.
 
-            print("Failed while retrieving API details. \nRequest url: {}".format(request_url))
             if self.fail_silently:
                 # If it should fail silently, it should just return an empty dictionary.
                 resp_dict = {}
