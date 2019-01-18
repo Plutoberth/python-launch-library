@@ -4,3 +4,4 @@ sphinx_rtd_theme
 requests
 python-dateutil
 aiohttp
+unidecode

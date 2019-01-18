@@ -22,8 +22,8 @@ DEFAULT_VERSION = "1.4"
 
 
 class Api:
-    def __init__(self, api_url: str = DEFAULT_API_URL, version: str = DEFAULT_VERSION, fail_silently: bool = True,
-                 retries: int = 5):
+    def __init__(self, api_url: str=DEFAULT_API_URL, version: str=DEFAULT_VERSION, fail_silently: bool=True,
+                 retries: int=5, unicode: bool=True):
         """
         The API class for the launchlibrary module.
 
@@ -31,6 +31,7 @@ class Api:
         :param version: Version of the api
         :param fail_silently: Set to false to raise exceptions when they occur.
         :param retries: The maximum amount of retries for requests that time out.
+        :param unicode: Set to False to convert unicode characters to ASCII using unidecode.
         """
         # CURRENTLY STUCK ON VERBOSE
         self.mode = "verbose"  # Pick between verbose, list, and summary. Data decreases from verbose to list.
@@ -38,10 +39,9 @@ class Api:
         # These probably shouldn't be changed unless the site changed its address. The wrapper may not work as well
         # with a different version than the default one.
         self.url = "/".join([api_url, version])
-
         self.fail_silently = fail_silently
-
         self.retries = retries
+        self.unicode = unicode
 
     def _get_url(self, endpoint, data: dict) -> str:
         """

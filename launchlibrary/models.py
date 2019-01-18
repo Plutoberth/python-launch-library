@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+from unidecode import unidecode
 from dateutil import parser
 from dateutil import relativedelta
 from functools import lru_cache
@@ -110,7 +110,12 @@ class BaseModel:
         """Sets the parameters of a class from an object (raw data, not inside "agencies" for example)"""
         self._modelize(json_object)
         for pythonic_name, api_name in self._param_translations.items():
-            setattr(self, pythonic_name, json_object.get(api_name, None))
+            data = json_object.get(api_name, None)
+            # If the data is a string, and the unicode option is set to false
+            if isinstance(data, str) and not self.api_instance.unicode:
+                data = unidecode(data)
+
+            setattr(self, pythonic_name, data)
 
     def _modelize(self, json_object):
         """Recursively goes over the json object, looking for any compatible models. It's recursive in an indirect
