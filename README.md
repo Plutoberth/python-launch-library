@@ -37,6 +37,7 @@ properties = launches[0].param_names
 - [x] Add more abstraction methods for the api calls (open to suggestions)
 - [x] Add magic method comparisons (open to suggestions)
 - [x] Asynchronous operation
+- [ ] Add aliases for actual API names with getattr
 - [ ] Add tests
 - [ ] Your suggestion here
 
