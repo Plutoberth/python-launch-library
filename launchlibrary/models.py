@@ -149,6 +149,15 @@ class BaseModel:
     def __hash__(self):
         return hash(getattr(self, "id", None)) + hash(type(self))
 
+    def __getattr__(self, item):
+        """
+        This function will allow the user to use the standard, non pythonic api names for the fields returned by the api
+        It's possible that the user will want to use API names like infoURLs, instead of info_urls. We can allow this
+        using our param_translation dictionaries.
+        """
+        if item in self._param_translations:
+            return getattr(self, self._param_translations[item], None)
+
 
 class AgencyType(BaseModel):
     """A class representing an agency type object."""
@@ -225,6 +234,8 @@ class LaunchStatus(BaseModel):
 class Launch(BaseModel):
     """A class representing a launch object.
 
+    You may use the **'windowstart'**, **'windowend'**, and **'net'** params to access datetime objects of the times.
+
     The comparison magic methods that are implemented essentially compare the dates of the two objects.
 
     =========  ===========
@@ -275,7 +286,9 @@ class Launch(BaseModel):
     def next(cls, api_instance: Api, num: int) -> List["Launch"]:
         """
         A simple abstraction method to get the next {num} launches.
+
         :param api_instance: An instance of launchlibrary.Api
+
         :param num: a number for the number of launches
         """
         return cls.fetch(api_instance, next=num, status=1)
