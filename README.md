@@ -26,6 +26,10 @@ launches = ll.Launch.fetch(api, next=5) # Any argument after "api" is not constr
 
 # You can fetch the pythonic property names by using launch.param_names
 properties = launches[0].param_names
+
+# It's now possible to also use the regular API names as well as pythonic names.
+vid_urls = launches[0].vid_urls
+vid_urls_2 = launches[0].vidURLs
 ```
 
 ### Todo
@@ -37,7 +41,7 @@ properties = launches[0].param_names
 - [x] Add more abstraction methods for the api calls (open to suggestions)
 - [x] Add magic method comparisons (open to suggestions)
 - [x] Asynchronous operation
-- [ ] Add aliases for actual API names with getattr
+- [x] Add aliases for actual API names with getattr
 - [ ] Add tests
 - [ ] Your suggestion here
 

@@ -16,7 +16,7 @@ Usage
   
 Usage of the wrapper is simple.
 
-.. code:: py
+.. code:: py3
 
   # First, import the library
   import launchlibrary as ll
@@ -38,7 +38,10 @@ Usage of the wrapper is simple.
   
   # Some properties, like agency, mandate the use of special methods, as their availability is not guaranteed or represented as an id only.
   launch_agency = next_5_go_launches[0].get_agency()
-  
+
+  # It's now possible to also use the regular API names as well as pythonic names.
+  vid_urls = launches[0].vid_urls
+  vid_urls_2 = launches[0].vidURLs
 
 Asynchronous Usage
 ------------------
