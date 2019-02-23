@@ -296,8 +296,8 @@ class Launch(BaseModel):
         for time_name in ["windowstart", "windowend", "net"]:
             try:
                 # Will need to modify this if we ever implement modes other than verbose
-                setattr(self, time_name, parser.parse(getattr(self, time_name, 0)))
-            except ValueError:
+                setattr(self, time_name, parser.parse(getattr(self, time_name, "")))
+            except (ValueError, TypeError):
                 # The string might not contain a date, so we'll need to handle it with an empty datetime object.
                 setattr(self, time_name, DEFAULT_DT)
 
