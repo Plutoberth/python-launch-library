@@ -58,7 +58,9 @@ class AsyncLaunch(Launch, BaseAsync):
     async def next(cls, api_instance: Api, num: int):
         """
         A simple abstraction method to get the next {num} launches.
+
         :param api_instance: An instance of launchlibrary.Api
+
         :param num: a number for the number of launches
         """
         return await cls.fetch(api_instance, next=num, status=1)
