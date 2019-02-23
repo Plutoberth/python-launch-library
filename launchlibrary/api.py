@@ -33,7 +33,6 @@ class Api:
         :param retries: The maximum amount of retries for requests that time out.
         :param unicode: Set to False to convert unicode characters to ASCII using unidecode.
         """
-        # CURRENTLY STUCK ON VERBOSE
         self.mode = "verbose"  # Pick between verbose, list, and summary. Data decreases from verbose to list.
 
         # These probably shouldn't be changed unless the site changed its address. The wrapper may not work as well

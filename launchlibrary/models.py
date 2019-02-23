@@ -54,7 +54,7 @@ class BaseModel:
         self._param_translations = param_translations
         self.api_instance = api_instance
         self.proper_name = proper_name
-        self.param_names = self._param_translations.keys()
+        self.param_names = self._param_translations.values()
 
     @classmethod
     def fetch(cls, api_instance: Api, **kwargs) -> list:
@@ -109,7 +109,7 @@ class BaseModel:
     def _set_params_json(self, json_object: dict):
         """Sets the parameters of a class from an object (raw data, not inside "agencies" for example)"""
         self._modelize(json_object)
-        for pythonic_name, api_name in self._param_translations.items():
+        for api_name, pythonic_name in self._param_translations.items():
             data = json_object.get(api_name, None)
             # If the data is a string, and the unicode option is set to false
             if isinstance(data, str) and not self.api_instance.unicode:
@@ -156,7 +156,7 @@ class AgencyType(BaseModel):
     _endpoint_name = "agencytype"
 
     def __init__(self, api_instance: Api):
-        param_translations = dict(id="id", name="name", changed="changed")
+        param_translations = {'id': "id", 'name': "name", 'changed': "changed"}
 
         self.id = None
         self.name = None
@@ -174,8 +174,9 @@ class Agency(BaseModel):
     _endpoint_name = "agency"
 
     def __init__(self, api_instance: Api):
-        param_translations = dict(id="id", name="name", abbrev="abbrev", type="type", country_code="countryCode"
-                                  , wiki_url="wikiURL", info_urls="infoURLs", is_lsp="islsp", changed="changed")
+        param_translations = {'id': 'id', 'name': 'name', 'abbrev': 'abbrev', 'type': 'type',
+                              'countryCode': 'country_code', 'wikiURL': 'wiki_url', 'infoURLs': 'info_urls',
+                              'islsp': 'is_lsp', 'changed': 'changed'}
 
         self.id = None
         self.name = None
@@ -209,7 +210,7 @@ class LaunchStatus(BaseModel):
     _endpoint_name = "launchstatus"
 
     def __init__(self, api_instance: Api):
-        param_translations = dict(id="id", name="name", description="description", changed="changed")
+        param_translations = {'id': 'id', 'name': 'name', 'description': 'description', 'changed': 'changed'}
 
         self.id = None
         self.name = None
@@ -237,13 +238,13 @@ class Launch(BaseModel):
     _endpoint_name = "launch"
 
     def __init__(self, api_instance: Api):
-        self.datetime_conversions = dict()
-        param_translations = dict(id="id", name="name", tbddate="tbddate", tbdtime="tbdtime", status="status"
-                                  , inhold="inhold", windowstart="isostart", windowend="isoend",
-                                  net="isonet", info_urls="infoURLs",
-                                  vid_urls="vidURLs", holdreason="holdreason", failreason="failreason",
-                                  probability="probability", hashtag="hashtag", agency="lsp", changed="changed",
-                                  location="location", rocket="rocket", missions="missions")
+        self.datetime_conversions = {}
+        param_translations = {'id': 'id', 'name': 'name', 'tbddate': 'tbddate', 'tbdtime': 'tbdtime',
+                              'status': 'status', 'inhold': 'inhold', 'isostart': 'windowstart', 'isoend': 'windowend',
+                              'isonet': 'net', 'infoURLs': 'info_urls', 'vidURLs': 'vid_urls',
+                              'holdreason': 'holdreason', 'failreason': 'failreason', 'probability': 'probability',
+                              'hashtag': 'hashtag', 'lsp': 'agency', 'changed': 'changed', 'location': 'location',
+                              'rocket': 'rocket', 'missions': 'missions'}
 
         self.id = None
         self.name = None
@@ -314,9 +315,10 @@ class Pad(BaseModel):
     _endpoint_name = "pad"
 
     def __init__(self, api_instance: Api):
-        param_translations = dict(id="id", name="name", pad_type="padType", latitude="latitude", longitude="longitude",
-                                  map_url="mapURL", retired="retired", locationid="locationid", agencies="agencies",
-                                  wiki_url="wikiURL", info_urls="infoURLs")
+        param_translations = {'id': 'id', 'name': 'name', 'padType': 'pad_type', 'latitude': 'latitude',
+                              'longitude': 'longitude', 'mapURL': 'map_url', 'retired': 'retired',
+                              'locationid': 'locationid', 'agencies': 'agencies',
+                              'wikiURL': 'wiki_url', 'infoURLs': 'info_urls'}
 
         self.id = None
         self.name = None
@@ -342,8 +344,9 @@ class Location(BaseModel):
     _endpoint_name = "location"
 
     def __init__(self, api_instance: Api):
-        param_translations = dict(id="id", name="name", country_code="countrycode", wiki_url="wikiURL"
-                                  , info_urls="infoURLs", pads="pads")  # pads might be included w/ launch endpoint
+        param_translations = {'id': 'id', 'name': 'name', 'countrycode': 'country_code',
+                              'wikiURL': 'wiki_url', 'infoURLs': 'info_urls', 'pads': 'pads'}
+        # pads might be included w/ launch endpoint
 
         self.id = None
         self.name = None
@@ -364,7 +367,7 @@ class RocketFamily(BaseModel):
     _endpoint_name = "rocketfamily"
 
     def __init__(self, api_instance: Api):
-        param_translations = dict(id="id", name="name", agencies="agencies", changed="changed")
+        param_translations = {'id': 'id', 'name': 'name', 'agencies': 'agencies', 'changed': 'changed'}
 
         self.id = None
         self.name = None
@@ -383,9 +386,9 @@ class Rocket(BaseModel):
     _endpoint_name = "rocket"
 
     def __init__(self, api_instance: Api):
-        param_translations = dict(id="id", name="name", default_pads="defaultPads", family="family",
-                                  wiki_url="wikiURL", info_urls="infoURLs", image_url="imageURL"
-                                  , image_sizes="imageSizes")
+        param_translations = {'id': 'id', 'name': 'name', 'defaultPads': 'default_pads', 'family': 'family',
+                              'wikiURL': 'wiki_url', 'infoURLs': 'info_urls', 'imageURL': 'image_url',
+                              'imageSizes': 'image_sizes'}
 
         self.id = None
         self.name = None
