@@ -39,8 +39,8 @@ release = '0.3'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx_autodoc_typehints',
     'sphinx.ext.viewcode',
-    'sphinx-autodoc-typehints'
 ]
 
 # Change autodoc order to by source
