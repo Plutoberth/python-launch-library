@@ -18,8 +18,10 @@ from dateutil import relativedelta
 from functools import lru_cache
 import datetime
 from typing import List
-from launchlibrary import Api
 from launchlibrary import utils
+from launchlibrary import DO_UNIDECODE
+from .network import Network
+
 
 # Set default dt to the beginning of next month
 DEFAULT_DT = datetime.datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0) \
@@ -42,69 +44,70 @@ class BaseModel:
     _endpoint_name = ""
     _nested_name = ""
 
-    def __init__(self, param_translations: dict, api_instance: Api, proper_name: str):
+    def __init__(self, network: Network, param_translations: dict, proper_name: str):
         """
         All launchlibrary models should inherit from this class. Contains utility and fetch functions.
 
+        :param network:  An instance of the Api class.
         :param param_translations:  Translations from API names to pythonic names.
-        :param api_instance:  An instance of the Api class.
         :param proper_name:  The proper name for use in __repr__
         """
+
+        self.network = network
         # param translations serves both for pythonic translations and default param values
         self._param_translations = param_translations
-        self.api_instance = api_instance
         self.proper_name = proper_name
         self.param_names = self._param_translations.values()
 
     @classmethod
-    def fetch(cls, api_instance: Api, **kwargs) -> list:
+    def fetch(cls, network: Network, **kwargs) -> list:
         """
         Initializes a class, or even a list of them from the api using the needed params.
 
-        :param api_instance: An instance of the Api class.
+        :param network: An instance of the network class
         :param kwargs: Arguments to include in the GET request
         """
 
         kwargs = utils.sanitize_input(kwargs)
 
-        json_object = api_instance.send_message(cls._endpoint_name, kwargs)
+        json_object = network.send_message(cls._endpoint_name, kwargs)
 
-        classes = cls._create_classes(api_instance, json_object)
+        classes = cls._create_classes(network, json_object)
 
         return classes
 
     @classmethod
-    def _create_classes(cls, api_instance: Api, json_object) -> list:
+    def init_from_json(cls, network: Network, json_object: dict):
+        """
+        Initializes a class from a json object. Only single classes.
+
+        :param network: launchlibrary.Network
+        :param json_object: An object containing the "entry" we want to init.
+        :return: cls
+        """
+        cls_init = cls(network)
+        cls_init._set_params_json(json_object)
+        cls_init._postprocess()
+        return cls_init
+
+    @classmethod
+    def _create_classes(cls, network: Network, json_object) -> list:
         """
         Creates the required classes from the json object.
 
-        :param api_instance:
+        :param network:
         :param json_object:
         :return:
         """
 
         classes = []
         for entry in json_object.get(cls._nested_name, []):
-            cls_init = cls(api_instance)
+            cls_init = cls(network)
             cls_init._set_params_json(entry)
             cls_init._postprocess()
             classes.append(cls_init)
 
         return classes
-
-    @classmethod
-    def init_from_json(cls, api_instance: Api, json_object: dict):
-        """
-        Initializes a class from a json object. Only single classes.
-
-        :param api_instance: launchlibrary.Api
-        :param json_object: An object containing the "entry" we want to init.
-        :return: cls
-        """
-        cls_init = cls(api_instance)
-        cls_init._set_params_json(json_object)
-        cls_init._postprocess()
-        return cls_init
 
     def _set_params_json(self, json_object: dict):
         """Sets the parameters of a class from an object (raw data, not inside "agencies" for example)"""
@@ -112,7 +115,7 @@ class BaseModel:
         for api_name, pythonic_name in self._param_translations.items():
             data = json_object.get(api_name, None)
             # If the data is a string, and the unicode option is set to false
-            if isinstance(data, str) and not self.api_instance.unicode:
+            if isinstance(data, str) and DO_UNIDECODE:
                 data = unidecode(data)
 
             setattr(self, pythonic_name, data)
@@ -125,11 +128,11 @@ class BaseModel:
             if key in MODEL_LIST_PLURAL.keys():
                 if val and isinstance(val, list):
                     if len(val) > 0:
-                        json_object[key] = [MODEL_LIST_PLURAL[key].init_from_json(self.api_instance, r) for r in val]
+                        json_object[key] = [MODEL_LIST_PLURAL[key].init_from_json(self.network, r) for r in val]
             elif key in MODEL_LIST_SINGULAR.keys():  # if it is a singular
                 if val and isinstance(val, dict):
                     if len(val) > 0:
-                        json_object[key] = MODEL_LIST_SINGULAR[key].init_from_json(self.api_instance, val)
+                        json_object[key] = MODEL_LIST_SINGULAR[key].init_from_json(self.network, val)
 
     def _postprocess(self):
         """Optional method. May be used for model specific operations (like purging times)."""
@@ -164,7 +167,7 @@ class AgencyType(BaseModel):
     _nested_name = "types"
     _endpoint_name = "agencytype"
 
-    def __init__(self, api_instance: Api):
+    def __init__(self, network: Network):
         param_translations = {'id': "id", 'name': "name", 'changed': "changed"}
 
         self.id = None
@@ -173,7 +176,7 @@ class AgencyType(BaseModel):
 
         proper_name = self.__class__.__name__
 
-        super().__init__(param_translations, api_instance, proper_name)
+        super().__init__(network, param_translations, proper_name)
 
 
 class Agency(BaseModel):
@@ -182,7 +185,7 @@ class Agency(BaseModel):
     _nested_name = "agencies"
     _endpoint_name = "agency"
 
-    def __init__(self, api_instance: Api):
+    def __init__(self, network: Network):
         param_translations = {'id': 'id', 'name': 'name', 'abbrev': 'abbrev', 'type': 'type',
                               'countryCode': 'country_code', 'wikiURL': 'wiki_url', 'infoURLs': 'info_urls',
                               'islsp': 'is_lsp', 'changed': 'changed'}
@@ -199,17 +202,17 @@ class Agency(BaseModel):
 
         proper_name = self.__class__.__name__
 
-        super().__init__(param_translations, api_instance, proper_name)
+        super().__init__(network, param_translations, proper_name)
 
     @lru_cache(maxsize=None)
     def get_type(self) -> AgencyType:
         if self.type:
-            agency_type = AgencyType.fetch(self.api_instance, id=self.type)
+            agency_type = AgencyType.fetch(self.network, id=self.type)
         else:
             agency_type = []
 
         # To avoid attribute errors on the user's side, if the type is not found simply create an empty one.
-        return agency_type[0] if len(agency_type) == 1 else AgencyType.init_from_json(self.api_instance, {})
+        return agency_type[0] if len(agency_type) == 1 else AgencyType.init_from_json(self.network, {})
 
 
 class LaunchStatus(BaseModel):
@@ -218,7 +221,7 @@ class LaunchStatus(BaseModel):
     _nested_name = "types"
     _endpoint_name = "launchstatus"
 
-    def __init__(self, api_instance: Api):
+    def __init__(self, network: Network):
         param_translations = {'id': 'id', 'name': 'name', 'description': 'description', 'changed': 'changed'}
 
         self.id = None
@@ -228,7 +231,7 @@ class LaunchStatus(BaseModel):
 
         proper_name = self.__class__.__name__
 
-        super().__init__(param_translations, api_instance, proper_name)
+        super().__init__(network, param_translations, proper_name)
 
 
 class Launch(BaseModel):
@@ -248,7 +251,7 @@ class Launch(BaseModel):
     _nested_name = "launches"
     _endpoint_name = "launch"
 
-    def __init__(self, api_instance: Api):
+    def __init__(self, network: Network):
         self.datetime_conversions = {}
         param_translations = {'id': 'id', 'name': 'name', 'tbddate': 'tbddate', 'tbdtime': 'tbdtime',
                               'status': 'status', 'inhold': 'inhold', 'isostart': 'windowstart', 'isoend': 'windowend',
@@ -280,29 +283,29 @@ class Launch(BaseModel):
 
         proper_name = self.__class__.__name__
 
-        super().__init__(param_translations, api_instance, proper_name)
+        super().__init__(network, param_translations, proper_name)
 
     @classmethod
-    def next(cls, api_instance: Api, num: int) -> List["Launch"]:
+    def next(cls, network: Network, num: int) -> List["Launch"]:
         """
         A simple abstraction method to get the next {num} launches.
 
-        :param api_instance: An instance of launchlibrary.Api
+        :param network: An instance of launchlibrary.Api
 
         :param num: a number for the number of launches
         """
-        return cls.fetch(api_instance, next=num, status=1)
+        return cls.fetch(network, next=num, status=1)
 
     @lru_cache(maxsize=None)
     def get_status(self) -> LaunchStatus:
         """Returns the LaunchStatus model for the corresponding status."""
         if self.status:
-            launch_status = LaunchStatus.fetch(self.api_instance, id=self.status)
+            launch_status = LaunchStatus.fetch(self.network, id=self.status)
         else:
             launch_status = []  # to let the ternary init an empty model
 
         # To avoid attribute errors on the user's side, if the status is not found simply create an empty one.
-        return launch_status[0] if len(launch_status) == 1 else LaunchStatus.init_from_json(self.api_instance, {})
+        return launch_status[0] if len(launch_status) == 1 else LaunchStatus.init_from_json(self.network, {})
 
     def _postprocess(self):
         """Changes times to the datetime format."""
@@ -312,7 +315,7 @@ class Launch(BaseModel):
                 setattr(self, time_name, parser.parse(getattr(self, time_name, "")))
             except (ValueError, TypeError):
                 # The string might not contain a date, so we'll need to handle it with an empty datetime object.
-                setattr(self, time_name, DEFAULT_DT)
+                setattr(self, time_name,  )
 
     def __lt__(self, other: "Launch") -> bool:
         return self.net < other.net
@@ -327,7 +330,7 @@ class Pad(BaseModel):
     _nested_name = "pads"
     _endpoint_name = "pad"
 
-    def __init__(self, api_instance: Api):
+    def __init__(self, network: Network):
         param_translations = {'id': 'id', 'name': 'name', 'padType': 'pad_type', 'latitude': 'latitude',
                               'longitude': 'longitude', 'mapURL': 'map_url', 'retired': 'retired',
                               'locationid': 'locationid', 'agencies': 'agencies',
@@ -347,7 +350,7 @@ class Pad(BaseModel):
 
         proper_name = self.__class__.__name__
 
-        super().__init__(param_translations, api_instance, proper_name)
+        super().__init__(network, param_translations, proper_name)
 
 
 class Location(BaseModel):
@@ -356,7 +359,7 @@ class Location(BaseModel):
     _nested_name = "locations"
     _endpoint_name = "location"
 
-    def __init__(self, api_instance: Api):
+    def __init__(self, network: Network):
         param_translations = {'id': 'id', 'name': 'name', 'countrycode': 'country_code',
                               'wikiURL': 'wiki_url', 'infoURLs': 'info_urls', 'pads': 'pads'}
         # pads might be included w/ launch endpoint
@@ -370,7 +373,7 @@ class Location(BaseModel):
 
         proper_name = self.__class__.__name__
 
-        super().__init__(param_translations, api_instance, proper_name)
+        super().__init__(network, param_translations, proper_name)
 
 
 class RocketFamily(BaseModel):
@@ -379,7 +382,7 @@ class RocketFamily(BaseModel):
     _nested_name = "RocketFamilies"
     _endpoint_name = "rocketfamily"
 
-    def __init__(self, api_instance: Api):
+    def __init__(self, network: Network):
         param_translations = {'id': 'id', 'name': 'name', 'agencies': 'agencies', 'changed': 'changed'}
 
         self.id = None
@@ -389,7 +392,7 @@ class RocketFamily(BaseModel):
 
         proper_name = self.__class__.__name__
 
-        super().__init__(param_translations, api_instance, proper_name)
+        super().__init__(network, param_translations, proper_name)
 
 
 class Rocket(BaseModel):
@@ -398,7 +401,7 @@ class Rocket(BaseModel):
     _nested_name = "rockets"
     _endpoint_name = "rocket"
 
-    def __init__(self, api_instance: Api):
+    def __init__(self, network: Network):
         param_translations = {'id': 'id', 'name': 'name', 'defaultPads': 'default_pads', 'family': 'family',
                               'wikiURL': 'wiki_url', 'infoURLs': 'info_urls', 'imageURL': 'image_url',
                               'imageSizes': 'image_sizes'}
@@ -414,14 +417,14 @@ class Rocket(BaseModel):
 
         proper_name = self.__class__.__name__
 
-        super().__init__(param_translations, api_instance, proper_name)
+        super().__init__(network, param_translations, proper_name)
 
     @lru_cache(maxsize=None)
     def get_pads(self) -> List[Pad]:
         """Returns Pad type objects of the pads the rocket uses."""
         pad_objs = []
         if self.default_pads:
-            pad_objs = Pad.fetch(self.api_instance, id=self.default_pads)
+            pad_objs = Pad.fetch(self.network, id=self.default_pads)
 
         return pad_objs
 

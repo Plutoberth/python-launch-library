@@ -12,133 +12,90 @@
 #    See the License for the specific language governing permissions and
 # limitations under the License.
 
-import requests
-import json
-from launchlibrary import exceptions as ll_exceptions
-import aiohttp
-
-DEFAULT_API_URL = "https://launchlibrary.net"
-DEFAULT_VERSION = "1.4"
+from .models import *
+from .async_models import *
+from .constants import *
+from typing import List
 
 
 class Api:
-    def __init__(self, api_url: str=DEFAULT_API_URL, version: str=DEFAULT_VERSION, fail_silently: bool=True,
-                 retries: int=5, unicode: bool=True):
+    def __init__(self, api_url: str = DEFAULT_LL_URL, version: str = DEFAULT_VERSION, unicode: bool = True):
         """
         The API class for the launchlibrary module.
 
         :param api_url: The URL of the launchlibrary website.
         :param version: Version of the api
-        :param fail_silently: Set to false to raise exceptions when they occur. Useful for debugging.
-        :param retries: The maximum amount of retries for requests that time out.
         :param unicode: Set to False to convert unicode characters to ASCII using unidecode.
         """
-        self.mode = "verbose"  # Pick between verbose, list, and summary. Data decreases from verbose to list.
 
         # These probably shouldn't be changed unless the site changed its address. The wrapper may not work as well
         # with a different version than the default one.
-        self.url = "/".join([api_url, version])
-        self.fail_silently = fail_silently
-        self.retries = retries
+        url = "/".join([api_url, version])
+        self.network = Network(url, "verbose")
         self.unicode = unicode
 
-    def _get_url(self, endpoint, data: dict) -> str:
+    def fetch_agencytype(self, **kwargs):
+        return AgencyType.fetch(self.network, **kwargs)
+
+    def fetch_agency(self, **kwargs):
+        return Agency.fetch(self.network, **kwargs)
+
+    def fetch_launch(self, **kwargs):
+        return Launch.fetch(self.network, **kwargs)
+
+    def next_launches(self, num: int) -> List[Launch]:
         """
-        Parse the data as GET parameters and return it as a proper request url.
+        Get the next {num} launches.
 
-        :param data: A dictionary containing values for the api call.
-        :return: A proper GET param string
+        :param num: a number for the number of launches
         """
-        params = "?mode={}&".format(self.mode) + "&".join(["{}={}".format(k, v) for k, v in data.items()])
-        return "/".join([self.url, endpoint]) + params
+        return Launch.next(self.network, num)
 
-    def _dispatch(self, endpoint: str, data: dict) -> dict:
-        request_url = self._get_url(endpoint, data)
-        try:
-            resp = requests.get(request_url)
-            if resp.status_code != 200:  # If the request failed for some reason
-                raise ll_exceptions.ApiException(
-                    "API call to `{}` responded with code `{}`\n"
-                    "Complete API response: `{}`".format(request_url, resp.status_code, resp.text)
-                )  # raise an api exception
-            resp_dict = resp.json()
+    def fetch_launchstatus(self, **kwargs):
+        return LaunchStatus.fetch(self.network, **kwargs)
 
-        except (requests.exceptions.RequestException, json.JSONDecodeError,
-                ll_exceptions.ApiException) as e:  # Catch all exceptions from the module
+    def fetch_pad(self, **kwargs):
+        return Pad.fetch(self.network, **kwargs)
 
-            if isinstance(e, requests.exceptions.ConnectTimeout):
-                raise e  # We want to raise this error to allow send_message to retry.
+    def fetch_location(self, **kwargs):
+        return Location.fetch(self.network, **kwargs)
 
-            if self.fail_silently:
-                # If it should fail silently, it should just return an empty dictionary.
-                resp_dict = {}
-            else:
-                raise e
+    def fetch_rocketfamily(self, **kwargs):
+        return RocketFamily.fetch(self.network, **kwargs)
 
-        return resp_dict  # Returns a json style object of the response.
+    def fetch_rocket(self, **kwargs):
+        return Rocket.fetch(self.network, **kwargs)
 
-    def send_message(self, endpoint: str, data: dict) -> dict:
+    # Async fetchers
+
+    async def async_fetch_agencytype(self, **kwargs):
+        return AsyncAgencyType.fetch(self.network, **kwargs)
+
+    async def async_fetch_agency(self, **kwargs):
+        return AsyncAgency.fetch(self.network, **kwargs)
+
+    async def async_fetch_launch(self, **kwargs):
+        return AsyncLaunch.fetch(self.network, **kwargs)
+
+    async def async_next_launches(self, num: int) -> List[AsyncLaunch]:
         """
-        A wrapper function for dispatch. Allows us to retry on timeouts.
+        Get the next {num} launches.
 
-        :param endpoint:  The api endpoint
-        :param data:  A dict containing data for the request
-        :return:  response dict.
+        :param num: a number for the number of launches
         """
-        attempts = self.retries
-        resp = {}
+        return await AsyncLaunch.next(self.network, num)
 
-        while attempts >= 1:
-            try:
-                resp = self._dispatch(endpoint, data)
-                break  # It will not reach this line if it gets a ConnectTimeout
-            except requests.exceptions.ConnectTimeout:
-                attempts -= 1
+    async def async_fetch_launchstatus(self, **kwargs):
+        return AsyncLaunchStatus.fetch(self.network, **kwargs)
 
-        return resp
+    async def async_fetch_pad(self, **kwargs):
+        return AsyncPad.fetch(self.network, **kwargs)
 
-    # I know that having two completely separate functions is messy, but it was necessary.
-    async def _async_dispatch(self, endpoint: str, data: dict) -> dict:
-        request_url = self._get_url(endpoint, data)
-        try:
-            async with aiohttp.ClientSession() as sess:
-                async with sess.get(request_url) as resp:
-                    resp_dict = await resp.json()
+    async def async_fetch_location(self, **kwargs):
+        return AsyncLocation.fetch(self.network, **kwargs)
 
-            if resp.status != 200:  # If the request failed for some reason
-                raise ll_exceptions.ApiException  # raise an api exception
+    async def async_fetch_rocketfamily(self, **kwargs):
+        return AsyncRocketFamily.fetch(self.network, **kwargs)
 
-        except (aiohttp.ClientError, json.JSONDecodeError,
-                ll_exceptions.ApiException) as e:  # Catch all exceptions from the module
-
-            if isinstance(e, aiohttp.ClientTimeoutError):
-                raise e  # We want to raise this error to allow send_message to retry.
-
-            print("Failed while retrieving API details. \nRequest url: {}".format(request_url))
-            if self.fail_silently:
-                # If it should fail silently, it should just return an empty dictionary.
-                resp_dict = {}
-            else:
-                raise e
-
-        return resp_dict  # Returns a json style object of the response.
-
-    async def async_send_message(self, endpoint: str, data: dict):
-        """
-        A wrapper function for _async_dispatch. Allows us to retry on timeouts with async.
-
-        :param endpoint:  The api endpoint
-        :param data:  A dict containing data for the request
-        :return:  response dict.
-        """
-        attempts = self.retries
-        resp = {}
-
-        while attempts >= 1:
-            try:
-                resp = await self._async_dispatch(endpoint, data)
-                break  # It will not reach this line if it gets a ConnectTimeout
-            except aiohttp.ClientTimeoutError:
-                attempts -= 1
-
-        return resp
+    async def async_fetch_rocket(self, **kwargs):
+        return AsyncRocket.fetch(self.network, **kwargs)
