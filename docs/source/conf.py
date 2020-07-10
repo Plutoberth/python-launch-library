@@ -14,8 +14,8 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../../'))
 
+sys.path.insert(0, os.path.abspath('../../'))
 
 # -- Project information -----------------------------------------------------
 
@@ -27,7 +27,6 @@ author = 'Plutoberth'
 version = ''
 # The full version, including alpha/beta/rc tags
 release = '0.3'
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -41,7 +40,7 @@ release = '0.3'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
-	'sphinx_autodoc_typehints'
+    'sphinx-autodoc-typehints'
 ]
 
 # Change autodoc order to by source
@@ -73,7 +72,6 @@ exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
-
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -109,7 +107,6 @@ html_static_path = ['_static']
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'python-launch-librarydoc'
 
-
 # -- Options for LaTeX output ------------------------------------------------
 
 latex_elements = {
@@ -138,7 +135,6 @@ latex_documents = [
      'Plutoberth', 'manual'),
 ]
 
-
 # -- Options for manual page output ------------------------------------------
 
 # One entry per manual page. List of tuples
@@ -147,7 +143,6 @@ man_pages = [
     (master_doc, 'python-launch-library', 'python-launch-library Documentation',
      [author], 1)
 ]
-
 
 # -- Options for Texinfo output ----------------------------------------------
 
@@ -159,6 +154,5 @@ texinfo_documents = [
      author, 'python-launch-library', 'One line description of project.',
      'Miscellaneous'),
 ]
-
 
 # -- Extension configuration -------------------------------------------------
