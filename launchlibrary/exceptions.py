@@ -16,7 +16,19 @@
 
 
 class ApiException(Exception):
-    def __init__(self, message="There was an unknown issue with the API. Please reevaluate your call."):
+    def __init__(self, message: str = "There was an unknown issue with the API. Please reevaluate your call."):
         super().__init__(message)
 
 
+class NetworkException(Exception):
+    """Some type of network failure unrelated to the request, like the connection timing out"""
+
+    def __init__(self, message: str):
+        super().__init__(message)
+
+
+class TimeoutException(Exception):
+    """All timeout failures, both during the initial connection and subsequent messages"""
+
+    def __init__(self, message: str = ""):
+        super().__init__(message)

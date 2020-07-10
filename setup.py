@@ -5,9 +5,9 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="python-launch-library",
-    version="0.6",
+    version="1",
     author="Nir Harel",
-    author_email="nir@nirharel.space",
+    author_email="nir@nirharel.dev",
     description="A wrapper for the launchlibrary.net API",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -21,10 +21,10 @@ setuptools.setup(
         "Programming Language :: Python :: 3.6"
     ],
     install_requires=[
-        "requests",
-        "python-dateutil",
-        "aiohttp",
-        "unidecode"
+        "requests>=2.22,<3",
+        "python-dateutil>=2.8,<3",
+        "aiohttp>=3.6,<4",
+        "unidecode>=1,<2"
     ],
     python_requires='>=3.6'
 )
