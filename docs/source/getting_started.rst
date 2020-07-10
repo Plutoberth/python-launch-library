@@ -4,7 +4,7 @@ Getting Started
 Installation
 ------------
 
-The python-launch-library module only supports Python 3.6 and above. If your installation passes these requirements, just use:
+The python-launch-library module only supports Python 3.6 and above. To install it, just use:
 
 .. code::
   

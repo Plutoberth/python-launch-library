@@ -1,8 +1,13 @@
 Module Documentation
 ====================
 
-API
+Api
 ---
+
+The Api class exposes the main interface for this library. A fetch method is provided for all models.
+
+The fetch method will get the data, turn it into python objects recursively, and do a few other nice things like adding python date-time objects.
+
 .. autoclass:: launchlibrary.Api
    :members:
    

@@ -35,12 +35,15 @@ class Api:
         self.unicode = unicode
 
     def fetch_agencytype(self, **kwargs):
+        """Fetch from the AgencyType endpoint"""
         return AgencyType.fetch(self.network, **kwargs)
 
     def fetch_agency(self, **kwargs):
+        """Fetch from the Agency endpoint"""
         return Agency.fetch(self.network, **kwargs)
 
     def fetch_launch(self, **kwargs):
+        """Fetch from the Launch endpoint"""
         return Launch.fetch(self.network, **kwargs)
 
     def next_launches(self, num: int) -> List[Launch]:
@@ -52,29 +55,37 @@ class Api:
         return Launch.next(self.network, num)
 
     def fetch_launchstatus(self, **kwargs):
+        """Fetch from the LaunchStatus endpoint"""
         return LaunchStatus.fetch(self.network, **kwargs)
 
     def fetch_pad(self, **kwargs):
+        """Fetch from the Pad endpoint"""
         return Pad.fetch(self.network, **kwargs)
 
     def fetch_location(self, **kwargs):
+        """Fetch from the Location endpoint"""
         return Location.fetch(self.network, **kwargs)
 
     def fetch_rocketfamily(self, **kwargs):
+        """Fetch from the RocketFamily endpoint"""
         return RocketFamily.fetch(self.network, **kwargs)
 
     def fetch_rocket(self, **kwargs):
+        """Fetch from the Rocket endpoint"""
         return Rocket.fetch(self.network, **kwargs)
 
     # Async fetchers
 
     async def async_fetch_agencytype(self, **kwargs):
+        """Fetch from the AgencyType endpoint"""
         return AsyncAgencyType.fetch(self.network, **kwargs)
 
     async def async_fetch_agency(self, **kwargs):
+        """Fetch from the Agency endpoint"""
         return AsyncAgency.fetch(self.network, **kwargs)
 
     async def async_fetch_launch(self, **kwargs):
+        """Fetch from the Launch endpoint"""
         return AsyncLaunch.fetch(self.network, **kwargs)
 
     async def async_next_launches(self, num: int) -> List[AsyncLaunch]:
@@ -86,16 +97,21 @@ class Api:
         return await AsyncLaunch.next(self.network, num)
 
     async def async_fetch_launchstatus(self, **kwargs):
+        """Fetch from the LaunchStatus endpoint"""
         return AsyncLaunchStatus.fetch(self.network, **kwargs)
 
     async def async_fetch_pad(self, **kwargs):
+        """Fetch from the Pad endpoint"""
         return AsyncPad.fetch(self.network, **kwargs)
 
     async def async_fetch_location(self, **kwargs):
+        """Fetch from the Location endpoint"""
         return AsyncLocation.fetch(self.network, **kwargs)
 
     async def async_fetch_rocketfamily(self, **kwargs):
+        """Fetch from the RocketFamily endpoint"""
         return AsyncRocketFamily.fetch(self.network, **kwargs)
 
     async def async_fetch_rocket(self, **kwargs):
+        """Fetch from the Rocket endpoint"""
         return AsyncRocket.fetch(self.network, **kwargs)

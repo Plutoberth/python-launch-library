@@ -32,6 +32,22 @@ vid_urls = launches[0].vid_urls
 vid_urls_2 = launches[0].vidURLs
 ```
 
+### Changelog
+
+* 1.0 - Changed all fetch calls to be through the Api object. This is a breaking change.
+  
+  ```python
+  import launchlibrary as ll
+  api = ll.Api()
+  
+  # Before
+  next_launch = ll.Launch.next(api, 1)
+  
+  # After
+  next_launch = api.next_launches(1)
+  ```
+
+
 ### Todo
 - [x] Tidy up the repository
 - [x] Add exceptions to handle server timeout
