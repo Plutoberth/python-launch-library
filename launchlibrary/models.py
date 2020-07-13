@@ -22,7 +22,6 @@ from launchlibrary import utils
 from launchlibrary import DO_UNIDECODE
 from .network import Network
 
-
 # Set default dt to the beginning of next month
 DEFAULT_DT = datetime.datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0) \
              + relativedelta.relativedelta(months=1)
@@ -204,10 +203,17 @@ class Agency(BaseModel):
 
         super().__init__(network, param_translations, proper_name)
 
-    @lru_cache(maxsize=None)
+    @staticmethod
+    @lru_cache
+    def _get_type_for_id(network: Network, type_id) -> List[AgencyType]:
+        """
+        Separated into a different function because we only care about type_id and the version endpoint for caching
+        """
+        return AgencyType.fetch(network, id=type_id)
+
     def get_type(self) -> AgencyType:
         if self.type:
-            agency_type = AgencyType.fetch(self.network, id=self.type)
+            agency_type = Agency._get_type_for_id(self.network, self.type)
         else:
             agency_type = []
 
@@ -238,6 +244,7 @@ class Launch(BaseModel):
     """A class representing a launch object.
 
     You may use the **'windowstart'**, **'windowend'**, and **'net'** params to access datetime objects of the times.
+    They'll be 'None' if the conversion fails.
 
     The comparison magic methods that are implemented essentially compare the dates of the two objects.
 
@@ -296,11 +303,19 @@ class Launch(BaseModel):
         """
         return cls.fetch(network, next=num, status=1)
 
-    @lru_cache(maxsize=None)
+    @staticmethod
+    @lru_cache
+    def _get_status_for_id(network: Network, status_id) -> List[LaunchStatus]:
+        """
+        Separating it to a different function allows lru_cache to only care about the network and id parameters.
+        These are the only ones that matter for this operation.
+        """
+        return LaunchStatus.fetch(network, id=status_id)
+
     def get_status(self) -> LaunchStatus:
         """Returns the LaunchStatus model for the corresponding status."""
         if self.status:
-            launch_status = LaunchStatus.fetch(self.network, id=self.status)
+            launch_status = Launch._get_status_for_id(self.network, self.status)
         else:
             launch_status = []  # to let the ternary init an empty model
 
@@ -315,7 +330,7 @@ class Launch(BaseModel):
                 setattr(self, time_name, parser.parse(getattr(self, time_name, "")))
             except (ValueError, TypeError):
                 # The string might not contain a date, so we'll need to handle it with an empty datetime object.
-                setattr(self, time_name,  )
+                setattr(self, time_name, None)
 
     def __lt__(self, other: "Launch") -> bool:
         return self.net < other.net
@@ -419,12 +434,16 @@ class Rocket(BaseModel):
 
         super().__init__(network, param_translations, proper_name)
 
-    @lru_cache(maxsize=None)
+    @staticmethod
+    @lru_cache
+    def _get_pads_for_id(network: Network, pads: str):
+        return Pad.fetch(network, id=pads)
+
     def get_pads(self) -> List[Pad]:
         """Returns Pad type objects of the pads the rocket uses."""
         pad_objs = []
         if self.default_pads:
-            pad_objs = Pad.fetch(self.network, id=self.default_pads)
+            pad_objs = Rocket._get_pads_for_id(self.network, self.default_pads)
 
         return pad_objs
 

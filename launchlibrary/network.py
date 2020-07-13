@@ -27,7 +27,6 @@ class Network:
 
         :param endpoint:  The api endpoint
         :param data:  A dict containing data for the request
-        :param options: NetworkOptions for the request
         :return:  response dict.
         """
         request_url = self._get_url(endpoint, data)
@@ -68,3 +67,7 @@ class Network:
             raise ll_exceptions.NetworkException(str(e))
 
         return resp_dict  # Returns a json style object of the response.
+
+    # For lru_cache. We're not hashing the sess because it doesn't affect responses
+    def __hash__(self):
+        return hash((self.url, self.mode))
