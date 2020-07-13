@@ -34,9 +34,17 @@ vid_urls_2 = launches[0].vidURLs
 
 ### Changelog
 
+Since version `1.0.1`, the library is versioned according to Semver.
+
+* 1.0.1 - Improved caching. 
+
 * 1.0 - Changed all fetch calls to be through the Api object. This is a breaking change.
   
+
+  
   ```python
+  # Porting guide
+
   import launchlibrary as ll
   api = ll.Api()
   
