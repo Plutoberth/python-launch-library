@@ -205,7 +205,7 @@ class Agency(BaseModel):
         super().__init__(network, param_translations, proper_name)
 
     @staticmethod
-    @lru_cache
+    @lru_cache()
     def _get_type_for_id(network: Network, type_id) -> List[AgencyType]:
         """
         Separated into a different function because we only care about type_id and the version endpoint for caching
@@ -305,7 +305,7 @@ class Launch(BaseModel):
         return cls.fetch(network, next=num, status=1)
 
     @staticmethod
-    @lru_cache
+    @lru_cache()
     def _get_status_for_id(network: Network, status_id) -> List[LaunchStatus]:
         """
         Separating it to a different function allows lru_cache to only care about the network and id parameters.
@@ -436,7 +436,7 @@ class Rocket(BaseModel):
         super().__init__(network, param_translations, proper_name)
 
     @staticmethod
-    @lru_cache
+    @lru_cache()
     def _get_pads_for_id(network: Network, pads: str):
         return Pad.fetch(network, id=pads)
 

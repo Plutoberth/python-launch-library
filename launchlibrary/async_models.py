@@ -35,10 +35,17 @@ class AsyncAgencyType(AgencyType, BaseAsync):
 class AsyncAgency(Agency, BaseAsync):
     """A class representing an async agency object."""
 
-    @lru_cache(maxsize=1)
+    @staticmethod
+    @lru_cache()
+    async def _get_type_for_id(network: Network, type_id):
+        """
+        Separated into a different function because we only care about type_id and the version endpoint for caching
+        """
+        return await AsyncAgencyType.fetch(network, id=type_id)
+
     async def get_type(self) -> list:
         if self.type:
-            agency_type = await AsyncAgencyType.fetch(self.network, id=self.type)
+            agency_type = await AsyncAgency._get_type_for_id(self.network, self.type)
         else:
             agency_type = []
 
@@ -64,16 +71,24 @@ class AsyncLaunch(Launch, BaseAsync):
         """
         return await cls.fetch(network, next=num, status=1)
 
-    @lru_cache(maxsize=None)
-    async def get_status(self) -> LaunchStatus:
+    @staticmethod
+    @lru_cache()
+    async def _get_status_for_id(network: Network, status_id):
+        """
+        Separating it to a different function allows lru_cache to only care about the network and id parameters.
+        These are the only ones that matter for this operation.
+        """
+        return await AsyncLaunchStatus.fetch(network, id=status_id)
+
+    async def get_status(self) -> AsyncLaunchStatus:
         """Returns the LaunchStatus model for the corresponding status."""
         if self.status:
-            launch_status = LaunchStatus.fetch(self.network, id=self.status)
+            launch_status = await AsyncLaunch._get_status_for_id(self.network, self.status)
         else:
             launch_status = []  # to let the ternary init an empty model
 
         # To avoid attribute errors on the user's side, if the status is not found simply create an empty one.
-        return launch_status[0] if len(launch_status) == 1 else LaunchStatus.init_from_json(self.network, {})
+        return launch_status[0] if len(launch_status) == 1 else AsyncLaunchStatus.init_from_json(self.network, {})
 
 
 class AsyncPad(Pad, BaseAsync):
@@ -94,11 +109,15 @@ class AsyncRocketFamily(RocketFamily, BaseAsync):
 class AsyncRocket(Rocket, BaseAsync):
     """A class representing an async rocket."""
 
-    @lru_cache(maxsize=None)
+    @staticmethod
+    @lru_cache()
+    async def _get_pads_for_id(network: Network, pads: str):
+        return await AsyncPad.fetch(network, id=pads)
+
     async def get_pads(self) -> List[AsyncPad]:
         """Returns Pad type objects of the pads the rocket uses."""
         pad_objs = []
         if self.default_pads:
-            pad_objs = await AsyncPad.fetch(self.network, id=self.default_pads)
+            pad_objs = await AsyncRocket._get_pads_for_id(self.network, self.default_pads)
 
         return pad_objs

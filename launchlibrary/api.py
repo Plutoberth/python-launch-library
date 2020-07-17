@@ -32,7 +32,11 @@ class Api:
         # with a different version than the default one.
         url = "/".join([api_url, version])
         self.network = Network(url, "verbose")
-        self.unicode = unicode
+
+        global DO_UNIDECODE
+        # I know that this is super hacky, but it'll work for almost all users.
+        # Fix it and submit a PR if you care.
+        DO_UNIDECODE = unicode
 
     def fetch_agencytype(self, **kwargs):
         """Fetch from the AgencyType endpoint"""
