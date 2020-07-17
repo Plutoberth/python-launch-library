@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath('../../'))
 # -- Project information -----------------------------------------------------
 
 project = 'python-launch-library'
-copyright = '2018, Plutoberth'
+copyright = '2020, Plutoberth'
 author = 'Plutoberth'
 
 # The short X.Y version

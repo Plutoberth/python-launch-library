@@ -16,7 +16,7 @@ The fetch method will get the data, turn it into python objects recursively, and
 Models
 ------
 
-As this library is based on the **launchlibrary** API, you can find a lot of info handily documented on `their website <https://launchlibrary.net/docs/1.4/api.html>`_ . 
+As this library is based on the **launchlibrary** API, you can find a lot of info on `their website <https://launchlibrary.net/docs/1.4/api.html>`_ .
 Note that the wrapper only uses verbose mode.
 
 Additionally, the parameters of every model can be accessed post-creation by using `model.param_names`.
@@ -36,6 +36,11 @@ The library also supports asynchronous operation. To receive proper coroutines, 
    :undoc-members:
    :show-inheritance:
 
+Exceptions
+----------
 
+The library attempts to not leak any exceptions except the regular Python ones, like ValueError and KeyError.
 
-	
+.. automodule:: launchlibrary.exceptions
+   :undoc-members:
+   :show-inheritance:
