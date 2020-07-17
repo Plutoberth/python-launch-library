@@ -36,6 +36,8 @@ vid_urls_2 = launches[0].vidURLs
 
 Since version `1.0.1`, the library is versioned according to Semver.
 
+* 1.0.3 - Bugfix
+
 * 1.0.2 - Added an exception hierarchy. All exceptions now inherit from LlException
 
 * 1.0.1 - Improved caching. 

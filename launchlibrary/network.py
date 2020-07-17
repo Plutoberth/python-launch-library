@@ -11,6 +11,7 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 # limitations under the License.
+import asyncio
 
 import aiohttp
 import aiohttp.web
@@ -73,7 +74,7 @@ class Network:
                 resp_dict = await resp.json()
 
         # Don't leak implementation details
-        except aiohttp.ClientTimeout as e:
+        except asyncio.TimeoutError as e:
             raise ll_exceptions.TimeoutException(str(e))
         except aiohttp.web.HTTPClientError as e:
             raise ll_exceptions.ApiException(str(e))
