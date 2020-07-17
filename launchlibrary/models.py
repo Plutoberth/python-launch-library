@@ -1,4 +1,4 @@
-# Copyright 2018 Nir Harel
+# Copyright 2020 Nir Harel
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -19,12 +19,13 @@ from functools import lru_cache
 import datetime
 from typing import List
 from launchlibrary import utils
-from launchlibrary import DO_UNIDECODE
 from .network import Network
 
 # Set default dt to the beginning of next month
 DEFAULT_DT = datetime.datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0) \
              + relativedelta.relativedelta(months=1)
+
+DO_UNIDECODE = False
 
 
 class BaseModel:
@@ -204,7 +205,7 @@ class Agency(BaseModel):
         super().__init__(network, param_translations, proper_name)
 
     @staticmethod
-    @lru_cache
+    @lru_cache()
     def _get_type_for_id(network: Network, type_id) -> List[AgencyType]:
         """
         Separated into a different function because we only care about type_id and the version endpoint for caching
@@ -304,7 +305,7 @@ class Launch(BaseModel):
         return cls.fetch(network, next=num, status=1)
 
     @staticmethod
-    @lru_cache
+    @lru_cache()
     def _get_status_for_id(network: Network, status_id) -> List[LaunchStatus]:
         """
         Separating it to a different function allows lru_cache to only care about the network and id parameters.
@@ -435,7 +436,7 @@ class Rocket(BaseModel):
         super().__init__(network, param_translations, proper_name)
 
     @staticmethod
-    @lru_cache
+    @lru_cache()
     def _get_pads_for_id(network: Network, pads: str):
         return Pad.fetch(network, id=pads)
 

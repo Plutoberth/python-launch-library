@@ -1,4 +1,4 @@
-# Copyright 2018 Nir Harel
+# Copyright 2020 Nir Harel
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -12,10 +12,9 @@
 #    See the License for the specific language governing permissions and
 # limitations under the License.
 
-DO_UNIDECODE = False
-
 from .api import Api
 from .models import *
 from .exceptions import *
 from .utils import *
 from .async_models import *
+
