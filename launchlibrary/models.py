@@ -19,12 +19,13 @@ from functools import lru_cache
 import datetime
 from typing import List
 from launchlibrary import utils
-from launchlibrary import DO_UNIDECODE
 from .network import Network
 
 # Set default dt to the beginning of next month
 DEFAULT_DT = datetime.datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0) \
              + relativedelta.relativedelta(months=1)
+
+DO_UNIDECODE = False
 
 
 class BaseModel:

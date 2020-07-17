@@ -20,20 +20,20 @@ class LlException(Exception):
 
 
 class ApiException(LlException):
-    """An exception related to the API's response. Inherits from LlException"""
+    """An exception related to the API's response"""
     def __init__(self, message: str = "There was an unknown issue with the API. Please reevaluate your call."):
         super().__init__(message)
 
 
 class NetworkException(LlException):
-    """Some network failure that's unrelated to the request, like a dropped connection. Inherits from LlException"""
+    """Some network failure that's unrelated to the request, like a dropped connection"""
 
     def __init__(self, message: str):
         super().__init__(message)
 
 
 class TimeoutException(LlException):
-    """All timeout failures, both during the initial connection and subsequent messages. Inherits from LlException"""
+    """All timeout failures, both during the initial connection and subsequent messages"""
 
     def __init__(self, message: str = ""):
         super().__init__(message)

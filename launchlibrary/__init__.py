@@ -18,4 +18,3 @@ from .exceptions import *
 from .utils import *
 from .async_models import *
 
-DO_UNIDECODE = False

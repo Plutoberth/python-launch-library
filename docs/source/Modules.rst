@@ -39,8 +39,9 @@ The library also supports asynchronous operation. To receive proper coroutines, 
 Exceptions
 ----------
 
-The library attempts to not leak any exceptions except the regular Python ones, like ValueError and KeyError.
+The library attempts not to leak any exceptions except the regular Python ones, like ValueError and KeyError.
 
 .. automodule:: launchlibrary.exceptions
+   :members:
    :undoc-members:
    :show-inheritance:
