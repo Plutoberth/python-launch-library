@@ -12,10 +12,10 @@
 #    See the License for the specific language governing permissions and
 # limitations under the License.
 
-DO_UNIDECODE = False
-
 from .api import Api
 from .models import *
 from .exceptions import *
 from .utils import *
 from .async_models import *
+
+DO_UNIDECODE = False

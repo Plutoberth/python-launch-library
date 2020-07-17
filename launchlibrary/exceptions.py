@@ -15,19 +15,25 @@
 # Unused at the moment. Will add exceptions later.
 
 
-class ApiException(Exception):
+class LlException(Exception):
+    def __init__(self, message: str = "There was an unspecified exception regarding the LaunchLibrary wrapper."):
+        super().__init__(message)
+
+
+class ApiException(LlException):
+    """An exception related to the API's response"""
     def __init__(self, message: str = "There was an unknown issue with the API. Please reevaluate your call."):
         super().__init__(message)
 
 
-class NetworkException(Exception):
+class NetworkException(LlException):
     """Some type of network failure unrelated to the request, like the connection timing out"""
 
     def __init__(self, message: str):
         super().__init__(message)
 
 
-class TimeoutException(Exception):
+class TimeoutException(LlException):
     """All timeout failures, both during the initial connection and subsequent messages"""
 
     def __init__(self, message: str = ""):
