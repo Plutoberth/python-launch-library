@@ -1,5 +1,5 @@
 from launchlibrary.models import *
-from functools import lru_cache
+from async_lru import alru_cache
 from .network import Network
 
 
@@ -36,7 +36,7 @@ class AsyncAgency(Agency, BaseAsync):
     """A class representing an async agency object."""
 
     @staticmethod
-    @lru_cache()
+    @alru_cache()
     async def _get_type_for_id(network: Network, type_id):
         """
         Separated into a different function because we only care about type_id and the version endpoint for caching
@@ -72,7 +72,7 @@ class AsyncLaunch(Launch, BaseAsync):
         return await cls.fetch(network, next=num, status=1)
 
     @staticmethod
-    @lru_cache()
+    @alru_cache()
     async def _get_status_for_id(network: Network, status_id):
         """
         Separating it to a different function allows lru_cache to only care about the network and id parameters.
@@ -110,7 +110,7 @@ class AsyncRocket(Rocket, BaseAsync):
     """A class representing an async rocket."""
 
     @staticmethod
-    @lru_cache()
+    @alru_cache()
     async def _get_pads_for_id(network: Network, pads: str):
         return await AsyncPad.fetch(network, id=pads)
 
