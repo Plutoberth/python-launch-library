@@ -44,6 +44,8 @@ vid_urls_2 = next_5_go_launches[0].vidURLs
 
 Since version `1.0.1`, the library is versioned according to semantic versioning rules.
 
+* 2.0.0 - Update to LL2, aka `https://thespacedevs.com/llapi`. There are some data changes, so this is a breaking change.
+
 * 1.0.3, 1.0.4, 1.0.5, 1.0.6 - Fixed some bugs in the async variant
 
 * 1.0.2 - Added an exception hierarchy. All exceptions now inherit from LlException

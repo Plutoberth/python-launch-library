@@ -21,7 +21,7 @@ from launchlibrary import exceptions as ll_exceptions
 
 
 class Network:
-    def __init__(self, url=DEFAULT_API_URL, mode="verbose"):
+    def __init__(self, url=DEFAULT_API_URL, mode="detailed"):
         self.url = url
         self.mode = mode
         self.sess = aiohttp.ClientSession(raise_for_status=True)

@@ -24,7 +24,7 @@ def sanitize_input(args: dict) -> dict:
     :return:
     """
     if "mode" in args:
-        del args["mode"]  # the mode should always be verbose
+        del args["mode"]  # the mode should always be detailed
 
     trans = str.maketrans(ILLEGAL_CHARS, ' ' * len(ILLEGAL_CHARS))
 
