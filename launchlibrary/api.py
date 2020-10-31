@@ -12,7 +12,6 @@
 #    See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .models import *
 from .async_models import *
 from .constants import *
 from typing import List
