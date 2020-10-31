@@ -1,3 +1,3 @@
-DEFAULT_LL_URL = "https://launchlibrary.net"
-DEFAULT_VERSION = "1.4"
+DEFAULT_LL_URL = "https://ll.thespacedevs.com"
+DEFAULT_VERSION = "2.0.0"
 DEFAULT_API_URL = "/".join([DEFAULT_LL_URL, DEFAULT_VERSION])

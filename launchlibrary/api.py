@@ -12,7 +12,6 @@
 #    See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .models import *
 from .async_models import *
 from .constants import *
 from typing import List
@@ -31,7 +30,7 @@ class Api:
         # These probably shouldn't be changed unless the site changed its address. The wrapper may not work as well
         # with a different version than the default one.
         url = "/".join([api_url, version])
-        self.network = Network(url, "verbose")
+        self.network = Network(url, "detailed")
 
         global DO_UNIDECODE
         # I know that this is super hacky, but it'll work for almost all users.

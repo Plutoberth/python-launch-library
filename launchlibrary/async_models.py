@@ -27,34 +27,8 @@ class BaseAsync(BaseModel):
 
 
 # All async models should be based on this, and all functions that use fetch should be reimplemented
-class AsyncAgencyType(AgencyType, BaseAsync):
-    """A class representing an async agency type object."""
-    pass
-
-
 class AsyncAgency(Agency, BaseAsync):
     """A class representing an async agency object."""
-
-    @staticmethod
-    @alru_cache()
-    async def _get_type_for_id(network: Network, type_id):
-        """
-        Separated into a different function because we only care about type_id and the version endpoint for caching
-        """
-        return await AsyncAgencyType.fetch(network, id=type_id)
-
-    async def get_type(self) -> list:
-        if self.type:
-            agency_type = await AsyncAgency._get_type_for_id(self.network, self.type)
-        else:
-            agency_type = []
-
-        return agency_type[0] if len(agency_type) == 1 else AgencyType.init_from_json(self.network, {})
-
-
-class AsyncLaunchStatus(LaunchStatus, BaseAsync):
-    """A class representing an async launch status object."""
-    pass
 
 
 class AsyncLaunch(Launch, BaseAsync):
@@ -71,25 +45,6 @@ class AsyncLaunch(Launch, BaseAsync):
         """
         return await cls.fetch(network, next=num, status=1)
 
-    @staticmethod
-    @alru_cache()
-    async def _get_status_for_id(network: Network, status_id):
-        """
-        Separating it to a different function allows lru_cache to only care about the network and id parameters.
-        These are the only ones that matter for this operation.
-        """
-        return await AsyncLaunchStatus.fetch(network, id=status_id)
-
-    async def get_status(self) -> AsyncLaunchStatus:
-        """Returns the LaunchStatus model for the corresponding status."""
-        if self.status:
-            launch_status = await AsyncLaunch._get_status_for_id(self.network, self.status)
-        else:
-            launch_status = []  # to let the ternary init an empty model
-
-        # To avoid attribute errors on the user's side, if the status is not found simply create an empty one.
-        return launch_status[0] if len(launch_status) == 1 else AsyncLaunchStatus.init_from_json(self.network, {})
-
 
 class AsyncPad(Pad, BaseAsync):
     """A class representing an async pad object."""
@@ -98,11 +53,6 @@ class AsyncPad(Pad, BaseAsync):
 
 class AsyncLocation(Location, BaseAsync):
     """A class representing an async Location object."""
-    pass
-
-
-class AsyncRocketFamily(RocketFamily, BaseAsync):
-    """A class representing an async rocket family."""
     pass
 
 

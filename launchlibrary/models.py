@@ -101,7 +101,7 @@ class BaseModel:
         """
 
         classes = []
-        for entry in json_object.get(cls._nested_name, []):
+        for entry in json_object.get("results", []):
             cls_init = cls(network)
             cls_init._set_params_json(entry)
             cls_init._postprocess()
@@ -162,23 +162,6 @@ class BaseModel:
             return getattr(self, self._param_translations[item], None)
 
 
-class AgencyType(BaseModel):
-    """A class representing an agency type object."""
-    _nested_name = "types"
-    _endpoint_name = "agencytype"
-
-    def __init__(self, network: Network):
-        param_translations = {'id': "id", 'name': "name", 'changed': "changed"}
-
-        self.id = None
-        self.name = None
-        self.changed = None
-
-        proper_name = self.__class__.__name__
-
-        super().__init__(network, param_translations, proper_name)
-
-
 class Agency(BaseModel):
     """A class representing an agency object."""
 
@@ -187,53 +170,17 @@ class Agency(BaseModel):
 
     def __init__(self, network: Network):
         param_translations = {'id': 'id', 'name': 'name', 'abbrev': 'abbrev', 'type': 'type',
-                              'countryCode': 'country_code', 'wikiURL': 'wiki_url', 'infoURLs': 'info_urls',
-                              'islsp': 'is_lsp', 'changed': 'changed'}
+                              'description': 'description', 'country_code': 'country_code', 'wiki_url': 'wiki_url',
+                              'info_url': 'info_url', 'changed': 'changed'}
 
         self.id = None
         self.name = None
         self.abbrev = None
         self.type = None
+        self.description = None
         self.country_code = None
         self.wiki_url = None
-        self.info_urls = None
-        self.is_lsp = None
-        self.changed = None
-
-        proper_name = self.__class__.__name__
-
-        super().__init__(network, param_translations, proper_name)
-
-    @staticmethod
-    @lru_cache()
-    def _get_type_for_id(network: Network, type_id) -> List[AgencyType]:
-        """
-        Separated into a different function because we only care about type_id and the version endpoint for caching
-        """
-        return AgencyType.fetch(network, id=type_id)
-
-    def get_type(self) -> AgencyType:
-        if self.type:
-            agency_type = Agency._get_type_for_id(self.network, self.type)
-        else:
-            agency_type = []
-
-        # To avoid attribute errors on the user's side, if the type is not found simply create an empty one.
-        return agency_type[0] if len(agency_type) == 1 else AgencyType.init_from_json(self.network, {})
-
-
-class LaunchStatus(BaseModel):
-    """A class representing a launch status object."""
-
-    _nested_name = "types"
-    _endpoint_name = "launchstatus"
-
-    def __init__(self, network: Network):
-        param_translations = {'id': 'id', 'name': 'name', 'description': 'description', 'changed': 'changed'}
-
-        self.id = None
-        self.name = None
-        self.description = None
+        self.info_url = None
         self.changed = None
 
         proper_name = self.__class__.__name__
@@ -262,8 +209,9 @@ class Launch(BaseModel):
     def __init__(self, network: Network):
         self.datetime_conversions = {}
         param_translations = {'id': 'id', 'name': 'name', 'tbddate': 'tbddate', 'tbdtime': 'tbdtime',
-                              'status': 'status', 'inhold': 'inhold', 'isostart': 'windowstart', 'isoend': 'windowend',
-                              'isonet': 'net', 'infoURLs': 'info_urls', 'vidURLs': 'vid_urls',
+                              'status': 'status', 'inhold': 'inhold', 'window_start': 'windowstart',
+                              'window_end': 'windowend',
+                              'net': 'net', 'infoURLs': 'info_urls', 'vidURLs': 'vid_urls',
                               'holdreason': 'holdreason', 'failreason': 'failreason', 'probability': 'probability',
                               'hashtag': 'hashtag', 'lsp': 'agency', 'changed': 'changed', 'location': 'location',
                               'rocket': 'rocket', 'missions': 'missions'}
@@ -304,30 +252,11 @@ class Launch(BaseModel):
         """
         return cls.fetch(network, next=num, status=1)
 
-    @staticmethod
-    @lru_cache()
-    def _get_status_for_id(network: Network, status_id) -> List[LaunchStatus]:
-        """
-        Separating it to a different function allows lru_cache to only care about the network and id parameters.
-        These are the only ones that matter for this operation.
-        """
-        return LaunchStatus.fetch(network, id=status_id)
-
-    def get_status(self) -> LaunchStatus:
-        """Returns the LaunchStatus model for the corresponding status."""
-        if self.status:
-            launch_status = Launch._get_status_for_id(self.network, self.status)
-        else:
-            launch_status = []  # to let the ternary init an empty model
-
-        # To avoid attribute errors on the user's side, if the status is not found simply create an empty one.
-        return launch_status[0] if len(launch_status) == 1 else LaunchStatus.init_from_json(self.network, {})
-
     def _postprocess(self):
         """Changes times to the datetime format."""
         for time_name in ["windowstart", "windowend", "net"]:
             try:
-                # Will need to modify this if we ever implement modes other than verbose
+                # Will need to modify this if we ever implement modes other than detailed
                 setattr(self, time_name, parser.parse(getattr(self, time_name, "")))
             except (ValueError, TypeError):
                 # The string might not contain a date, so we'll need to handle it with an empty datetime object.
@@ -347,22 +276,23 @@ class Pad(BaseModel):
     _endpoint_name = "pad"
 
     def __init__(self, network: Network):
-        param_translations = {'id': 'id', 'name': 'name', 'padType': 'pad_type', 'latitude': 'latitude',
-                              'longitude': 'longitude', 'mapURL': 'map_url', 'retired': 'retired',
-                              'locationid': 'locationid', 'agencies': 'agencies',
-                              'wikiURL': 'wiki_url', 'infoURLs': 'info_urls'}
+        param_translations = {'id': 'id', 'name': 'name', 'latitude': 'latitude',
+                              'longitude': 'longitude', 'map_url': 'map_url', 'retired': 'retired',
+                              'total_launch_count': 'total_launch_count', 'agency_id': 'agency_id',
+                              'wiki_url': 'wiki_url', 'info_url': 'info_url',
+                              'location': 'location', 'map_image': 'map_image'}
 
         self.id = None
         self.name = None
-        self.pad_type = None
         self.latitude = None
         self.longitude = None
         self.map_url = None
-        self.retired = None
-        self.locationid = None
-        self.agencies = None
         self.wiki_url = None
-        self.info_urls = None
+        self.info_url = None
+        self.agency_id = None
+        self.total_launch_count = None
+        self.location = None
+        self.map_image = None
 
         proper_name = self.__class__.__name__
 
@@ -376,35 +306,17 @@ class Location(BaseModel):
     _endpoint_name = "location"
 
     def __init__(self, network: Network):
-        param_translations = {'id': 'id', 'name': 'name', 'countrycode': 'country_code',
-                              'wikiURL': 'wiki_url', 'infoURLs': 'info_urls', 'pads': 'pads'}
+        param_translations = {'id': 'id', 'name': 'name', 'country_code': 'country_code',
+                              'total_launch_count': 'total_launch_count', 'total_landing_count': 'total_landing_count',
+                              'pads': 'pads'}
         # pads might be included w/ launch endpoint
 
         self.id = None
         self.name = None
         self.country_code = None
-        self.wiki_url = None
-        self.info_urls = None
+        self.total_launch_count = None
+        self.total_landing_count = None
         self.pads = None
-
-        proper_name = self.__class__.__name__
-
-        super().__init__(network, param_translations, proper_name)
-
-
-class RocketFamily(BaseModel):
-    """A class representing a rocket family object."""
-
-    _nested_name = "RocketFamilies"
-    _endpoint_name = "rocketfamily"
-
-    def __init__(self, network: Network):
-        param_translations = {'id': 'id', 'name': 'name', 'agencies': 'agencies', 'changed': 'changed'}
-
-        self.id = None
-        self.name = None
-        self.agencies = None
-        self.changed = None
 
         proper_name = self.__class__.__name__
 
@@ -415,21 +327,20 @@ class Rocket(BaseModel):
     """A class representing a rocket object."""
 
     _nested_name = "rockets"
-    _endpoint_name = "rocket"
+    _endpoint_name = "config/launcher"
 
     def __init__(self, network: Network):
         param_translations = {'id': 'id', 'name': 'name', 'defaultPads': 'default_pads', 'family': 'family',
-                              'wikiURL': 'wiki_url', 'infoURLs': 'info_urls', 'imageURL': 'image_url',
-                              'imageSizes': 'image_sizes'}
+                              'wiki_url': 'wiki_url', 'info_url': 'info_url', 'image_url': 'image_url',
+                              }
 
         self.id = None
         self.name = None
         self.default_pads = None
         self.family = None
         self.wiki_url = None
-        self.info_urls = None
+        self.info_url = None
         self.image_url = None
-        self.image_sizes = None
 
         proper_name = self.__class__.__name__
 
@@ -450,7 +361,7 @@ class Rocket(BaseModel):
 
 
 # putting it at the end to load the classes first
-MODEL_LIST_PLURAL = {"agencies": Agency, "pads": Pad, "locations": Location
-    , "rockets": Rocket, "families": RocketFamily}
-MODEL_LIST_SINGULAR = {"agency": Agency, "pad": Pad, "location": Location, "rocket": Rocket, "family": RocketFamily,
-                       "lsp": Agency}
+MODEL_LIST_PLURAL = {"launch_service_providers": Agency, "pads": Pad, "locations": Location
+    , "rockets": Rocket, "launcher_list": Rocket}
+MODEL_LIST_SINGULAR = {"launch_service_provider": Agency, "manufacturer": "Agency", "pad": Pad,
+                       "location": Location, "rocket": Rocket, "lsp": Agency}

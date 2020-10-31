@@ -3,7 +3,9 @@ A simple python wrapper for the Launch Library web API. Can also be used asynchr
 
 [![PyPI Version](https://img.shields.io/pypi/v/python-launch-library.svg)](https://pypi.org/project/python-launch-library/) [![Documentation Status](https://readthedocs.org/projects/python-launch-library/badge/?version=latest)](https://python-launch-library.readthedocs.io/en/latest/?badge=latest)
 
-Available models: `Agency, AgencyType, Launch, Launch Status, Pad, Location, Rocket, RocketFamily`
+### Important: New projects should NOT use this library. Instead, use the OpenAPI definitions provided in https://ll.thespacedevs.com/2.0.0/swagger
+
+Available models: `Agency, Launch, Pad, Location, Rocket`
 
 The usage of the API is simple.
 
@@ -43,6 +45,18 @@ vid_urls_2 = next_5_go_launches[0].vidURLs
 ### Changelog
 
 Since version `1.0.1`, the library is versioned according to semantic versioning rules.
+
+### Important: New projects should NOT use this library. Instead, use the OpenAPI definitions provided in https://ll.thespacedevs.com/2.0.0/swagger
+
+* 2.0.0 - Update to LL2, aka `https://thespacedevs.com/llapi`. There are some data changes, so this is a breaking change.
+    
+    **This is a quickly hacked together attempt to add some compatibility to LL2 for current users, as there's no point in spending time creating a wrapper when OpenAPI definitions exist.**
+    
+    Breaking Changes:
+    *  The AgencyType, LaunchStatus, and RocketFamily models have been eliminated.
+    *  All instances, except in `Launch` of `info_urls` have been changed to `info_url` (this is compliant with the new API).
+    *  Many parameters might be unavailable as many names were changed.
+    *  Modelizations might not work as well as many names were changed.
 
 * 1.0.3, 1.0.4, 1.0.5, 1.0.6 - Fixed some bugs in the async variant
 
