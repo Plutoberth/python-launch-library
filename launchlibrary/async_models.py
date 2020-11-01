@@ -34,6 +34,10 @@ class AsyncAgency(Agency, BaseAsync):
 class AsyncLaunch(Launch, BaseAsync):
     """A class representing an async launch object."""
 
+
+class AsyncUpcomingLaunch(UpcomingLaunch, BaseAsync):
+    """A class representing an upcoming launch object."""
+
     @classmethod
     async def next(cls, network: Network, num: int):
         """
@@ -43,7 +47,7 @@ class AsyncLaunch(Launch, BaseAsync):
 
         :param num: a number for the number of launches
         """
-        return await cls.fetch(network, next=num, status=1)
+        return await cls.fetch(network)
 
 
 class AsyncPad(Pad, BaseAsync):

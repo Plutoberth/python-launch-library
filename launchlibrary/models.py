@@ -213,7 +213,7 @@ class Launch(BaseModel):
                               'window_end': 'windowend',
                               'net': 'net', 'infoURLs': 'info_urls', 'vidURLs': 'vid_urls',
                               'holdreason': 'holdreason', 'failreason': 'failreason', 'probability': 'probability',
-                              'hashtag': 'hashtag', 'lsp': 'agency', 'changed': 'changed', 'location': 'location',
+                              'hashtag': 'hashtag', 'lsp': 'agency', 'changed': 'changed', 'pad': 'pad',
                               'rocket': 'rocket', 'missions': 'missions'}
 
         self.id = None
@@ -233,24 +233,13 @@ class Launch(BaseModel):
         self.hashtag = None
         self._lsp = None
         self.changed = None
-        self.location = None
+        self.pad = None
         self.rocket = None
         self.missions = None
 
         proper_name = self.__class__.__name__
 
         super().__init__(network, param_translations, proper_name)
-
-    @classmethod
-    def next(cls, network: Network, num: int) -> List["Launch"]:
-        """
-        A simple abstraction method to get the next {num} launches.
-
-        :param network: An instance of launchlibrary.Api
-
-        :param num: a number for the number of launches
-        """
-        return cls.fetch(network, next=num, status=1)
 
     def _postprocess(self):
         """Changes times to the datetime format."""
@@ -267,6 +256,25 @@ class Launch(BaseModel):
 
     def __gt__(self, other: "Launch") -> bool:
         return self.net > other.net
+
+
+class UpcomingLaunch(Launch):
+    _nested_name = "launches"
+    _endpoint_name = "launch/upcoming"
+
+    def __init__(self, network: Network):
+        super().__init__(network)
+
+    @classmethod
+    def next(cls, network: Network, num: int) -> List["UpcomingLaunch"]:
+        """
+        A simple abstraction method to get the next {num} launches.
+
+        :param network: An instance of launchlibrary.Api
+
+        :param num: a number for the number of launches
+        """
+        return cls.fetch(network, next=num, status=1)
 
 
 class Pad(BaseModel):
