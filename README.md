@@ -3,7 +3,7 @@ A simple python wrapper for the Launch Library web API. Can also be used asynchr
 
 [![PyPI Version](https://img.shields.io/pypi/v/python-launch-library.svg)](https://pypi.org/project/python-launch-library/) [![Documentation Status](https://readthedocs.org/projects/python-launch-library/badge/?version=latest)](https://python-launch-library.readthedocs.io/en/latest/?badge=latest)
 
-## Important: New projects should NOT use this library. Instead, generate client stubs from the [OpenAPI definitions](https://ll.thespacedevs.com/2.0.0/swagger) using [openapi-generator](https://github.com/OpenAPITools/openapi-generator).
+## Important: New projects should NOT use this library. Instead, generate client stubs from the [OpenAPI definitions](https://ll.thespacedevs.com/2.0.0/swagger?format=openapi) using [openapi-generator](https://github.com/OpenAPITools/openapi-generator).
 
 Available models: `Agency, Launch, Pad, Location, Rocket`
 
